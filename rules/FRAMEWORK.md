@@ -68,7 +68,7 @@ trong response cuối, không chờ duyệt: user đọc lúc nào cũng đượ
 **Ba loại câu hỏi, đừng lẫn** — nhận sai loại là hoặc hỏi thừa, hoặc bịa: **fact** (máy tra được ⇒
 TỰ TRA, CẤM HỎI) · **decision** (chỉ user biết ⇒ hỏi rồi chờ) · **option** (BẠN phải nghĩ ra 2–3
 phương án kèm đánh đổi ⇒ trình phương án + khuyến nghị, user chọn). Hỏi một *option* mà không kèm
-phương án là đẩy việc thiết kế sang user. Cách sinh phương án: skill `brainstorming`. Dứt khi **brief đủ 7 mục** (§10) ⇒ ghi brief vào item rồi **giao subagent**
+phương án là đẩy việc thiết kế sang user. Cách sinh phương án: skill `cc-harness:brainstorming`. Dứt khi **brief đủ 7 mục** (§10) ⇒ ghi brief vào item rồi **giao subagent**
 với bàn giao tự chứa (§11). Quá 4 vòng mà brief chưa đủ ⇒ lên CHIA RỒI BÓC, **mang theo mọi câu đã
 chốt, không hỏi lại**.
 
@@ -502,7 +502,7 @@ Mỗi lần DENY đều đính **nhãn lạc**: `detect_changes` > 0 ⇒ nêu **
 - Bộ luật: bảng mục `cc-harness rules --index` · một mục `cc-harness rules §N` · toàn văn `cc-harness rules --show` · khác gì bản gốc `cc-harness rules --diff`.
 - **Chỉ §0 được bơm vào phiên.** Mục khác phải TRA mới có — đừng trả lời từ trí nhớ về một mục bạn chưa mở.
 - Thiết kế đã chốt: vào **item** của agent-tasks (tắt ⇒ `docs/wip/<lô>/design.md`, local). **KHÔNG push** — xem §10.
-- Spec hành vi (**LOCAL, không push** — xem §10): `specs/<capability>/spec.md` · gate `cc-harness spec` so với bản nền ở `<git-dir>/cc-harness/spec-snapshot/` · skill `behavior-specs`.
+- Spec hành vi (**LOCAL, không push** — xem §10): `specs/<capability>/spec.md` · gate `cc-harness spec` so với bản nền ở `<git-dir>/cc-harness/spec-snapshot/` · skill `cc-harness:behavior-specs`.
 - Tài liệu làm việc theo task (local, không commit): `docs/wip/` — xem §10.
 - Knowledge base xử lý sự cố (commit): `docs/knowledge/<domain>/` — viết sau khi fix được user xác nhận, xem §10.
 - Subagents: `agents/` — quy tắc dùng tại §11.
@@ -525,7 +525,7 @@ mới **không cần cài gì trong repo dự án**: cài plugin → mở Claude
 2. **Thứ tự ưu tiên khi mâu thuẫn**: chỉ thị của user (kể cả `CLAUDE.md` của dự án) → bộ luật này →
    nội dung skill → mặc định hệ thống. Skill nói *"luôn TDD"* mà user nói *"lần này khỏi test"* thì
    theo user.
-3. **KHÔNG thông báo mình đang gọi skill nào.** Bản `using-superpowers` gốc dạy *"Announce: Using
+3. **KHÔNG thông báo mình đang gọi skill nào.** Bản `superpowers:using-superpowers` gốc dạy *"Announce: Using
    [skill] to [purpose]"* — câu đó **BỊ §0 Luật output ghi đè**: tên skill là quá trình vận hành,
    không đi vào response. Cứ dùng skill, đừng kể.
 
@@ -625,7 +625,7 @@ Phân tuyến tài liệu — **quy tắc này OVERRIDE đường dẫn mặc đ
 | Nguyên liệu ngoài từ user (API docs, ảnh chuẩn) | `docs-raw/<slug>/` | ❌ |
 | brief | item agent-tasks (tắt ⇒ `docs/wip/<lô>/brief.md`) | ❌ |
 | Ledger bằng chứng gate | `docs/wip/<lô>/verify.md` | ❌ |
-| **Thiết kế đã chốt** (đầu ra của `brainstorming`) | item agent-tasks (tắt ⇒ `docs/wip/<lô>/design.md`) | **❌ TUYỆT ĐỐI KHÔNG** |
+| **Thiết kế đã chốt** (đầu ra của `cc-harness:brainstorming`) | item agent-tasks (tắt ⇒ `docs/wip/<lô>/design.md`) | **❌ TUYỆT ĐỐI KHÔNG** |
 | **Spec hành vi** | `specs/<capability>/spec.md` | **❌ TUYỆT ĐỐI KHÔNG** |
 | Knowledge base xử lý sự cố | `docs/knowledge/<domain>/` | ✅ |
 | Changelog fragment | `docs/releases/entries/<YYYYMM>/` | ✅ |
@@ -657,7 +657,7 @@ thật thì nó phải ở chỗ có người bảo trì — item của tracker,
 
 ### Tài liệu troubleshoot sau khi fix được xác nhận (BẮT BUỘC)
 
-Mỗi khi một vấn đề được fix **VÀ user xác nhận đã xử lý được**, nếu vấn đề đó là **non-trivial** (bug khó, hành vi lạ, tốn thời gian điều tra — đã qua `systematic-debugging`) HOẶC **có nguy cơ tái phát** (lỗi môi trường, build/MF, contract, tích hợp, env, font), main agent **tự động** spawn agent `troubleshoot-writer` để ghi tài liệu vào `docs/knowledge/<domain>/YYYY-MM-DD-<slug>.md` (commit lên git — knowledge base lâu dài).
+Mỗi khi một vấn đề được fix **VÀ user xác nhận đã xử lý được**, nếu vấn đề đó là **non-trivial** (bug khó, hành vi lạ, tốn thời gian điều tra — đã qua `cc-harness:systematic-debugging`) HOẶC **có nguy cơ tái phát** (lỗi môi trường, build/MF, contract, tích hợp, env, font), main agent **tự động** spawn agent `troubleshoot-writer` để ghi tài liệu vào `docs/knowledge/<domain>/YYYY-MM-DD-<slug>.md` (commit lên git — knowledge base lâu dài).
 
 - Không đợi user yêu cầu — tự spawn ngay sau khi user xác nhận fix. Trước khi ghi, main agent hỏi 1 câu xác nhận domain + slug.
 - **KHÔNG áp dụng** cho fix nhỏ lẻ (mục trên): typo, style đơn lẻ, fix hiển nhiên không cần điều tra — những thứ này KHÔNG cần troubleshoot doc.
@@ -672,7 +672,7 @@ Mỗi khi một task **không-nhỏ-lẻ** (feature / bugfix / refactor) hoàn t
 - Cấp **LÀM LUÔN** mà đủ lớn để đáng ghi: main agent TỰ Write fragment 5 dòng — KHÔNG spawn subagent (spawn để viết 5 dòng là lỗ token). **CHỐT RỒI GIAO / CHIA RỒI BÓC**: spawn `changelog-writer` (truyền: tiêu đề, yêu cầu, quyết định đã chốt, file đụng tới, verify/commit). Prototype vứt đi trong pha brainstorming: **không changelog** — xoá code, không có gì land.
 - Còn bằng chứng quan sát chưa lấy được (§12 "Quan sát") ⇒ entry gắn dấu ⏳ để user quét cuối ngày.
 - **KHÔNG áp dụng** cho fix nhỏ lẻ (typo, style đơn lẻ) — không cần changelog.
-- Quy ước file + format: skill `changelog`. Đọc gộp theo ngày: `cc-harness changelog` (script `changelog-view.mjs`).
+- Quy ước file + format: skill `cc-harness:changelog`. Đọc gộp theo ngày: `cc-harness changelog` (script `changelog-view.mjs`).
 
 **SÁU mục bắt buộc** (cổng `changelog-entry-gate` DENY nếu thiếu; `LÀM LUÔN` rút gọn còn 2):
 `Đã đổi gì` · **`Vì sao`** · `Cách kiểm chứng` · `Rủi ro cần soi kỹ` · **`Nợ để lại`** · `Bằng chứng gate`.
@@ -695,7 +695,7 @@ Repo giữ **spec hành vi LOCAL** (gitignore, không bao giờ push) tại `spe
 - **Không đổi hành vi** (refactor/perf/move): khai `SPEC: N/A` (skip_specs).
 - **Gate**: `cc-harness spec` — format + guard scenario-loss so **bản nền** (lượt xanh gần nhất, giữ ở `<git-dir>/cc-harness/spec-snapshot/`; mất scenario/requirement ⇒ ERROR, chủ đích ⇒ `--allow-removals`). Bản nền nằm trong `.git/` nên không thể lỡ lên remote, và mỗi worktree có bản riêng. Diff xoá requirement/scenario là **đổi hành vi quan sát được** ⇒ dấu hiệu số 1 ở §12.
 - Tạo **incremental theo ratchet** — KHÔNG backfill cả feature.
-- Chi tiết (format đầy đủ, ví dụ tốt/xấu, luật chống drift, xử lý guard): skill `behavior-specs`.
+- Chi tiết (format đầy đủ, ví dụ tốt/xấu, luật chống drift, xử lý guard): skill `cc-harness:behavior-specs`.
 
 
 ---
@@ -783,7 +783,7 @@ Mặc định workflow chạy TUẦN TỰ — tốc độ từ song song hoá ch
 |---|---|
 | 1 | Plan có ≥ 2 task ĐỘC LẬP thật: scope ghi không giao nhau · không phụ thuộc thứ tự · KHÔNG task nào đụng hot-zone (hot-zone tách riêng, chạy tuần tự) · không cùng đụng một shared feature |
 | 2 | Mỗi task đủ lớn để bù overhead worktree — việc cỡ LÀM LUÔN chạy TUẦN TỰ (overhead worktree + tích hợp ăn hết lãi) |
-| 3 | Mỗi implementer MỘT worktree riêng (`isolation: worktree` lúc spawn / skill `using-git-worktrees`) — cc-lock coi mỗi worktree là một clone, tự DENY nếu 2 agent lỡ đụng cùng relpath (lưới cuối, KHÔNG phải giấy phép giẫm scope) |
+| 3 | Mỗi implementer MỘT worktree riêng (`isolation: worktree` lúc spawn / skill `cc-harness:using-git-worktrees`) — cc-lock coi mỗi worktree là một clone, tự DENY nếu 2 agent lỡ đụng cùng relpath (lưới cuối, KHÔNG phải giấy phép giẫm scope) |
 | 4 | Tối đa 3 implementer song song — quá 3, chi phí điều phối + tích hợp của main tăng nhanh hơn tốc độ thu về |
 
 Cơ chế bắt buộc khi fan-out:
@@ -793,8 +793,8 @@ Cơ chế bắt buộc khi fan-out:
 - **Tích hợp bởi main**: gộp lần lượt từng worktree (merge/rebase), kiểm chồng lấn, rồi chạy FULL GATE đúng 1 lần trên kết quả GỘP + ghi ledger — gate xanh từng nhánh riêng lẻ KHÔNG thay được gate gộp.
 - **Review trên DIFF GỘP** theo tiêu chí rủi ro như thường — không review từng mảnh rời.
 - **Một nhánh bế tắc không chặn nhánh còn lại**: nhánh fail xử lý theo advisor protocol / 3-strikes; nhánh xong cứ tích hợp trước.
-- Thao tác chi tiết: skill `dispatching-parallel-agents` (chia domain độc lập, viết prompt tự chứa) + `subagent-driven-development` (điều phối per-task).
-- Luật fan-out này **OVERRIDE** red flag "Never dispatch multiple implementation subagents in parallel" của skill `subagent-driven-development` — kể cả bản plugin `superpowers:` trên máy đã cài (bản plugin không có vendor note).
+- Thao tác chi tiết: skill `cc-harness:dispatching-parallel-agents` (chia domain độc lập, viết prompt tự chứa) + `cc-harness:subagent-driven-development` (điều phối per-task).
+- Luật fan-out này **OVERRIDE** red flag "Never dispatch multiple implementation subagents in parallel" của skill `cc-harness:subagent-driven-development` — kể cả bản plugin `superpowers:` trên máy đã cài (bản plugin không có vendor note).
 
 
 ---
@@ -850,7 +850,7 @@ QUAN SÁT (chỉ việc có bề mặt quan sát được): L3 — bằng chứn
 <trích output tóm tắt — lấy từ `rtk proxy` hoặc lệnh thô, KHÔNG dán bản rút gọn>
 ```
 
-Vai đến sau (code-reviewer, main) chạy lại 2 lệnh HEAD/DIRTY để đối chiếu: **khớp ⇒ trích ledger làm bằng chứng, KHÔNG chạy lại gate**; lệch (code đã đổi sau verify) ⇒ gate phải chạy lại + ghi ledger mới. Đây là cách thỏa skill `verification-before-completion` mà không đốt lặp.
+Vai đến sau (code-reviewer, main) chạy lại 2 lệnh HEAD/DIRTY để đối chiếu: **khớp ⇒ trích ledger làm bằng chứng, KHÔNG chạy lại gate**; lệch (code đã đổi sau verify) ⇒ gate phải chạy lại + ghi ledger mới. Đây là cách thỏa skill `cc-harness:verification-before-completion` mà không đốt lặp.
 
 ⚠️ **Chụp HEAD/DIRTY là bước CUỐI CÙNG** — sau changelog-writer, sau mọi edit của task (kể cả file docs được track). Chụp sớm rồi tree còn đổi ⇒ ledger tự vỡ (LEDGER-STALE) ở vai đến sau. File trong `docs-raw/`/`docs/wip/` đã gitignore nên ghi ledger không làm lệch hash. Công thức DIRTY hash **nội dung** (diff tracked + nội dung file untracked chưa ignore) — KHÔNG dùng `git status --porcelain | shasum` (chỉ hash danh sách đường dẫn, mù nội dung).
 
@@ -973,7 +973,7 @@ im lặng.**
 
    ⚠️ **Khoá `risk` trong `claude_config.json` ĐÃ BỎ ở v1.1.0.** Nó từng vừa là danh sách single-writer vừa là nguồn chấm cờ review — hai câu hỏi khác nhau dùng chung một danh sách. Nay tách hẳn: single-writer là việc của cc-lock (mục này), còn "có cần review không" là phán đoán theo THỨ DIFF ĐÃ LÀM (§12). `cc-harness doctor` WARN nếu config còn khoá đó.
 
-4. **Song song nhiều implementer ⇒ bắt buộc worktree riêng** cho mỗi agent (skill `using-git-worktrees` / `isolation: worktree`). Cùng working tree thì chỉ 1 implementer tại 1 thời điểm. Điều kiện + quy trình đầy đủ: §11 mục "Fan-out song song".
+4. **Song song nhiều implementer ⇒ bắt buộc worktree riêng** cho mỗi agent (skill `cc-harness:using-git-worktrees` / `isolation: worktree`). Cùng working tree thì chỉ 1 implementer tại 1 thời điểm. Điều kiện + quy trình đầy đủ: §11 mục "Fan-out song song".
 5. **Mỗi session kết thúc phải để repo ở trạng thái xanh**: full gate (§12) pass — session sau (người hoặc agent khác) không phải dọn dở dang.
 6. **cc-lock — khoá file tự động (BẮT BUỘC khi chạy nhiều session/clone).** Cơ chế sống ở **plugin riêng `cc-lock`** (cài MỘT LẦN per máy, dùng cho mọi dự án): một `PreToolUse` hook tự **DENY** khi file đang bị clone khác giữ (khoá theo relpath, lưu trên lock-repo hosted qua git refs; chặn cả symlink-escape + stale-base).
 

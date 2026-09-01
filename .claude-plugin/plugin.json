@@ -1,7 +1,7 @@
 {
   "name": "cc-harness",
   "description": "Bộ khung quy trình cho Claude Code — workflow bắt buộc, 12 subagent chuyên trách, hooks, và gate chạy thẳng từ plugin. Đọc claude_config.json ở repo dự án để biết dùng design system nào, luật gì, gate trên thư mục nào.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "author": {
     "name": "TanTranDev"
   },

@@ -17,7 +17,7 @@ user duyệt — **trong phạm vi skill này**. Thiết kế có thể ngắn; 
 | Ai | Trả lời câu gì | Dứt khi |
 |---|---|---|
 | **§0 hai cổng** | *đi đường nào* | đã ra một cấp việc |
-| **`confirm-understanding`** | *user MUỐN gì* (loại `decision`) | brief đủ 7 mục |
+| **`cc-harness:confirm-understanding`** | *user MUỐN gì* (loại `decision`) | brief đủ 7 mục |
 | **skill này** | *xây thế nào* (loại `option`) | một phương án đã chọn + đã qua lưới tách biệt |
 
 Ranh giới kiểm được bằng đúng một câu: **ai SINH ra câu trả lời.** `decision` thì user đã có sẵn
@@ -32,7 +32,7 @@ Ba đường còn lại không đi qua đây:
 | Tình huống | Đường đúng |
 |---|---|
 | Không còn gì chưa chốt, làm được trong một lượt | **LÀM LUÔN** — nêu giả định 2–3 dòng rồi làm |
-| Có gì chưa chốt nhưng làm được trong một lượt | **CHỐT RỒI GIAO** — `confirm-understanding`, ≤ 4 vòng, dứt khi brief đủ 7 mục. KHÔNG thiết kế, KHÔNG plan |
+| Có gì chưa chốt nhưng làm được trong một lượt | **CHỐT RỒI GIAO** — `cc-harness:confirm-understanding`, ≤ 4 vòng, dứt khi brief đủ 7 mục. KHÔNG thiết kế, KHÔNG plan |
 | Không còn gì chưa chốt nhưng quá nhiều việc | **CHIA RỒI BÓC cửa B** — vào THẲNG bước chia. Không có gì để quyết thì đào yêu cầu là nghi lễ |
 
 > **Hai chỗ CỐ Ý lệch bản gốc `superpowers`, không phải sót.** Ai merge bản upstream mới đọc kỹ hai
@@ -59,7 +59,7 @@ Tạo một task cho từng mục, làm theo thứ tự.
    lưu file, billing, analytics"*) ⇒ nói ra NGAY và chia trước. Đừng tiêu câu hỏi để tinh chỉnh chi
    tiết của một thứ đang cần chia.
 3. **Hỏi làm rõ** — một câu mỗi lượt, ưu tiên multiple choice; mục tiêu là *mục đích · ràng buộc ·
-   tiêu chí thành công*. Đây là phần chồng với `confirm-understanding`: brief 7 mục chưa đủ thì lấp
+   tiêu chí thành công*. Đây là phần chồng với `cc-harness:confirm-understanding`: brief 7 mục chưa đủ thì lấp
    ở đây, đừng chạy lại cả skill kia.
 4. **Mời visual companion ĐÚNG LÚC** — không mời trước. Xem mục cuối.
 5. **Sinh 2–3 PHƯƠNG ÁN** kèm đánh đổi + khuyến nghị. Mục dưới.
