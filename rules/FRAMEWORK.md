@@ -159,7 +159,8 @@ persist. Chúng KHÔNG phải quyết định của agent.
 Task đụng contract ⇒ **DỪNG, hỏi người phụ trách tích hợp**. Không cấp việc nào cho phép tự
 quyết ở đây (xem §0 "Phân loại việc" — cổng này ĐỘC LẬP với hai cổng đó).
 
-Ví dụ đã điền cho một mini-app React Native + Module Federation: `examples/rn-miniapp/contract.md`.
+Ví dụ về HÌNH THỨC của một tệp override (nội dung là của MỘT stack — React Native + Module
+Federation — nên đọc lấy khuôn, đừng chép nội dung): `examples/rn-miniapp/contract.md`.
 
 ---
 
@@ -230,7 +231,7 @@ hai câu hỏi khác nhau, và bộ khung trước chỉ có câu đầu.
 trong context, và sửa chính xác hơn khi tệp tập trung. **Tệp phình lên thường là tín hiệu nó đang làm
 quá nhiều việc**, không phải tín hiệu cần nới trần.
 
-Ví dụ đã điền cho một mini-app React Native + Module Federation: `examples/rn-miniapp/architecture.md`.
+Ví dụ về HÌNH THỨC (nội dung của một stack cụ thể): `examples/rn-miniapp/architecture.md`.
 ### Enforcement — `cc-harness structure` (ratchet)
 
 Quét 4 loại vi phạm: file quá trần LOC · import chéo feature (trừ whitelist, và chỉ qua public
@@ -338,8 +339,8 @@ Thư viện, runner, cách dựng test double: **của dự án**, ghi ở `PROJ
 4. **Wire ở composition root** — một test ở tầng đó nếu đây là luồng chính.
 5. `cc-harness gate` xanh → changelog fragment → commit.
 
-Không có skeleton mẫu ở đây: cây thư mục và đuôi tệp là chuyện của stack. Ví dụ đã điền cho một
-mini-app React Native: `examples/rn-miniapp/workflow.md`.
+Không có skeleton mẫu ở đây: cây thư mục và đuôi tệp là chuyện của stack. Ví dụ về HÌNH THỨC, điền
+sẵn cho MỘT stack: `examples/rn-miniapp/workflow.md`.
 
 ---
 
@@ -435,8 +436,8 @@ không?"* Không ⇒ mục 2. Có ⇒ mục 3.
 ] } }
 ```
 
-Ví dụ đã điền cho React Native (gồm bẫy TextInput cắt descender — thứ chỉ đúng với RN):
-`examples/rn-miniapp/conventions.md`.
+Ví dụ về HÌNH THỨC: `examples/rn-miniapp/conventions.md`. ⚠️ Nội dung tệp đó chỉ đúng với stack của
+nó (vd bẫy `TextInput` cắt descender) — dự án stack khác viết quy ước của MÌNH, cùng khuôn, khác chữ.
 
 ---
 

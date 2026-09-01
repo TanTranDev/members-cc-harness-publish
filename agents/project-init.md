@@ -112,7 +112,9 @@ Bộ luật gốc không gắn với stack nào. Từ Phase 2–3, đề xuất 
 | §3 Test | khi cần nêu runner/thư viện/chỗ đặt tệp test cụ thể |
 | §6 Quy ước | khi có bẫy riêng của framework hoặc lint rule bắt buộc |
 
-Mẫu đã điền cho một mini-app React Native: `examples/rn-miniapp/` (kèm README nói ba điều dễ làm sai).
+Mẫu về HÌNH THỨC, điền sẵn cho MỘT stack (React Native): `examples/rn-miniapp/` — kèm README nói ba
+điều dễ làm sai. Dự án Go/Python/Rust/Java… dùng CÙNG cơ chế, chỉ khác nội dung tệp override; KHÔNG
+cần có ví dụ riêng cho stack đó mới làm được.
 
 ⚠️ `replace` **nuốt trọn mục con**. Nhắc user ghép phần generic vào tệp override của mình, đừng chỉ
 dán phần riêng. Mục override phải có dòng `<!-- when: ... -->`; mục thuộc LÕI phải giữ

@@ -208,7 +208,8 @@ nếu thiếu).
 - `remove` cố ý **ỒN**: mọi phiên đều thấy *"dự án này đã GỠ §X vì …"*. Cho phép tuỳ biến, không cho
   phép lỗ luật im lặng.
 
-Mẫu đã điền cho một mini-app React Native: `examples/rn-miniapp/` (kèm README nêu ba điều dễ làm sai).
+Mẫu về HÌNH THỨC, điền sẵn cho MỘT stack (React Native): `examples/rn-miniapp/` — kèm README nêu ba
+điều dễ làm sai. Đọc lấy khuôn tệp, không phải nội dung.
 
 ### `observe` — bằng chứng quan sát, KHÔNG BAO GIỜ chặn task
 
