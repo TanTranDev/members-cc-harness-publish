@@ -1,6 +1,6 @@
 ---
 name: changelog
-description: Use when a non-trivial task (feature / bugfix / refactor) is completed and you need to record what was asked, how it was decided, and the result — or when the user asks to write/append a dev changelog entry. Triggers: "ghi changelog", "thêm changelog", "log this task", after finishing+verifying a task.
+description: Use when a non-trivial task (feature / bugfix / refactor) is completed and you need to record what was asked, how it was decided, and the result — or when the user asks to write/append a dev changelog entry. Triggers — "ghi changelog", "thêm changelog", "log this task", after finishing+verifying a task.
 ---
 
 # Changelog (dev) — fragment per entry

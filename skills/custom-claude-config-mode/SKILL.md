@@ -1,6 +1,6 @@
 ---
 name: custom-claude-config-mode
-description: Chuyển công tắc quality/balance/usage cho bộ khung điều phối model (per-clone). Dùng khi user gõ /custom-claude-config-mode [quality|balance|usage], hoặc nói "đổi sang mode tiết kiệm / usage / balance / quality", "bật tiết kiệm usage", "về baseline chất lượng", "xem/đổi config-mode". quality = baseline CLAUDE.md §0 (mặc định). balance = mức giữa — model như quality nhưng ngân sách spawn siết như usage. usage = hạ model subagent xuống tier rẻ (delta). Triggers on: config-mode, mode tiết kiệm, usage mode, balance mode, quality mode, tiết kiệm token/usage, đổi routing model.
+description: Chuyển công tắc quality/balance/usage cho bộ khung điều phối model (per-clone). Dùng khi user gõ /custom-claude-config-mode [quality|balance|usage], hoặc nói "đổi sang mode tiết kiệm / usage / balance / quality", "bật tiết kiệm usage", "về baseline chất lượng", "xem/đổi config-mode". quality = baseline CLAUDE.md §0 (mặc định). balance = mức giữa — model như quality nhưng ngân sách spawn siết như usage. usage = hạ model subagent xuống tier rẻ (delta). Triggers — config-mode, mode tiết kiệm, usage mode, balance mode, quality mode, tiết kiệm token/usage, đổi routing model.
 ---
 
 # custom-claude-config-mode — công tắc quality/balance/usage
