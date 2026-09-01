@@ -8,7 +8,7 @@
     {
       "name": "cc-harness",
       "source": "./",
-      "version": "1.1.3",
+      "version": "1.1.4",
       "description": "Workflow bắt buộc, subagents, hooks, gate. Route design system theo claude_config.json của từng dự án."
     }
   ]
