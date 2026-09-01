@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# cc-harness — cửa vào duy nhất của bộ khung. Claude Code đưa `bin/` của plugin vào PATH khi
+# plugin bật, nên lệnh này gõ được thẳng trong Bash tool mà không cần file nào trong repo dự án.
+#
+# Shim mỏng, cố ý: mọi logic ở bin/lib/cli.mjs. Lý do có shim thay vì gọi thẳng .mjs — tệp
+# extensionless cần package.json `type: module` để Node hiểu là ESM, và ràng buộc ngầm đó là thứ
+# hỏng im lặng khi ai đó dọn package.json. Bash script thì không có ràng buộc nào.
+set -u
+
+# HAI gốc, cố ý tách rời — gộp chúng là bug đã gặp ngay lần chạy thử đầu tiên:
+#   SELF_ROOT   = nơi shim này nằm. cli.mjs là RUỘT của shim, luôn đi cùng nó ⇒ tìm theo đây.
+#   PLUGIN_ROOT = nơi chứa tài sản plugin (rules/, policy/…). Claude Code cấp qua biến môi trường.
+# Bản trước dùng CLAUDE_PLUGIN_ROOT cho CẢ HAI, nên biến đó lệch một chút là Node ném
+# "Cannot find module …/bin/lib/cli.mjs" — thông điệp nói về nội tại của plugin, vô nghĩa với
+# người đang dùng, và không chỉ ra được biến nào sai.
+SELF_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-$SELF_ROOT}"
+
+command -v node >/dev/null 2>&1 || {
+  echo "cc-harness: thiếu \`node\` trong PATH — bộ khung cần Node để chạy gate và trộn luật." >&2
+  exit 2
+}
+
+CLI="$SELF_ROOT/bin/lib/cli.mjs"
+[ -f "$CLI" ] || {
+  echo "cc-harness: bản cài hỏng — không thấy $CLI (shim đang chạy từ $SELF_ROOT)." >&2
+  echo "            Cài lại plugin: claude plugin install cc-harness@members-cc-harness" >&2
+  exit 2
+}
+
+exec node "$CLI" --plugin-root "$PLUGIN_ROOT" "$@"

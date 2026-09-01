@@ -1,0 +1,197 @@
+{
+  "schema": 1,
+  "modes": [
+    "quality",
+    "balance",
+    "usage"
+  ],
+  "defaultMode": "quality",
+  "invariants": {
+    "smartZoneK": 120,
+    "timeboxMin": 30,
+    "reviewLoopBudget": 2,
+    "threeStrikes": 3,
+    "fanoutMax": 3,
+    "reviewFloorModel": "opus"
+  },
+  "spawnBudget": {
+    "implementer": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "code-reviewer": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "explorer": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "planner": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "debugger": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "advisor": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "verifier": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "brief-writer": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "changelog-writer": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "troubleshoot-writer": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    },
+    "project-init": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
+    }
+  },
+  "modelRouting": {
+    "implementer": {
+      "quality": "opus",
+      "balance": "opus",
+      "usage": "sonnet"
+    },
+    "planner": {
+      "quality": "opus",
+      "balance": "opus",
+      "usage": "sonnet"
+    },
+    "debugger": {
+      "quality": "opus",
+      "balance": "opus",
+      "usage": "sonnet"
+    },
+    "explorer": {
+      "quality": "sonnet",
+      "balance": "sonnet",
+      "usage": "haiku"
+    },
+    "code-reviewer": {
+      "quality": "opus",
+      "balance": "opus",
+      "usage": "opus"
+    },
+    "verifier": {
+      "quality": "haiku",
+      "balance": "haiku",
+      "usage": "haiku"
+    },
+    "advisor": {
+      "quality": "opus",
+      "balance": "opus",
+      "usage": "opus"
+    },
+    "brief-writer": {
+      "quality": "opus",
+      "balance": "opus",
+      "usage": "opus"
+    },
+    "troubleshoot-writer": {
+      "quality": "opus",
+      "balance": "opus",
+      "usage": "opus"
+    },
+    "changelog-writer": {
+      "quality": "haiku",
+      "balance": "haiku",
+      "usage": "haiku"
+    },
+    "project-init": {
+      "quality": "inherit",
+      "balance": "inherit",
+      "usage": "inherit"
+    }
+  }
+}

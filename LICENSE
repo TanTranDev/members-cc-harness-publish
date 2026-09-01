@@ -1,0 +1,158 @@
+cc-harness — PROPRIETARY LICENCE / GIẤY PHÉP ĐỘC QUYỀN
+=======================================================
+
+Copyright (c) 2026 TanTranDev. All rights reserved. / Bảo lưu mọi quyền.
+
+Bản tiếng Việt và bản tiếng Anh có giá trị như nhau. Nếu hai bản khác nghĩa, bản
+tiếng Việt là bản quyết định.
+The Vietnamese and English texts are equally authoritative. In case of conflict,
+the Vietnamese text controls.
+
+-------------------------------------------------------------------------------
+0. PHẦN CỦA NGƯỜI KHÁC — ĐỌC TRƯỚC / THIRD-PARTY PORTIONS — READ FIRST
+-------------------------------------------------------------------------------
+
+Phần mềm này chứa các phần dẫn xuất từ công trình của bên thứ ba, được phát hành
+dưới giấy phép RIÊNG của họ. Giấy phép này KHÔNG áp dụng cho những phần đó, và
+KHÔNG hạn chế bất kỳ quyền nào bạn đã có với chúng theo giấy phép gốc — kể cả khi
+bạn lấy chúng trực tiếp từ nguồn gốc. Danh sách và toàn văn giấy phép gốc:
+`THIRD-PARTY-NOTICES.md`.
+
+This Software contains portions derived from third-party works licensed under
+their OWN terms. This Licence does not apply to those portions and does not
+restrict any rights you already hold in them under their original licences,
+including rights obtained directly from the original source. See
+`THIRD-PARTY-NOTICES.md`.
+
+-------------------------------------------------------------------------------
+1. ĐỊNH NGHĨA / DEFINITIONS
+-------------------------------------------------------------------------------
+
+"Phần mềm" / "Software": toàn bộ nội dung của repository này và mọi bản phát hành
+của nó, TRỪ các phần được nêu ở `THIRD-PARTY-NOTICES.md`.
+
+"Chủ sở hữu" / "Owner": TanTranDev.
+
+"Bạn" / "You": cá nhân hoặc tổ chức truy cập, tải, sao chép, hoặc chạy Phần mềm.
+
+"Sử dụng thương mại" / "Commercial Use": mọi việc sử dụng trong hoặc phục vụ cho
+một hoạt động sinh lợi, bao gồm nhưng không giới hạn: dùng trong công việc được
+trả tiền; dùng trong hoặc cho một tổ chức kinh doanh; dùng để tạo ra sản phẩm,
+dịch vụ, hoặc kết quả bàn giao có thu phí; bán, cho thuê, cấp phép lại, hoặc
+cung cấp Phần mềm (hoặc bất kỳ phần nào của nó, hoặc công trình phái sinh) như
+một sản phẩm hay dịch vụ.
+
+-------------------------------------------------------------------------------
+2. KHÔNG CÓ QUYỀN NÀO ĐƯỢC CẤP MẶC ĐỊNH / NO RIGHTS GRANTED BY DEFAULT
+-------------------------------------------------------------------------------
+
+Bạn KHÔNG có quyền sử dụng, sao chép, sửa đổi, phân phối, xuất bản, cấp phép lại,
+hoặc tạo công trình phái sinh từ Phần mềm, TRỪ KHI được Chủ sở hữu cho phép
+BẰNG VĂN BẢN, và chỉ trong đúng phạm vi văn bản đó nêu.
+
+You have no right to use, copy, modify, distribute, publish, sublicense, or
+create derivative works of the Software except as expressly permitted by the
+Owner IN WRITING, and only within the scope stated in that writing.
+
+**Sử dụng thương mại luôn cần cho phép bằng văn bản.** Không có ngoại lệ ngầm.
+**Commercial Use always requires written permission.** There is no implied
+exception.
+
+-------------------------------------------------------------------------------
+3. QUYỀN TRUY CẬP KHÔNG PHẢI LÀ QUYỀN SỬ DỤNG / ACCESS IS NOT A LICENCE
+-------------------------------------------------------------------------------
+
+Việc bạn có được quyền truy cập Phần mềm — qua repository riêng tư, token truy
+cập, bản phát hành, marketplace plugin, bản sao từ đồng nghiệp, hay bất kỳ đường
+nào khác — **KHÔNG** cấu thành sự cho phép theo Mục 2, và không hàm ý cho phép.
+
+Obtaining access to the Software — through a private repository, an access token,
+a release, a plugin marketplace, a copy from a colleague, or any other route —
+does NOT constitute or imply the permission required by Section 2.
+
+-------------------------------------------------------------------------------
+4. VIỆC BỊ CẤM TUYỆT ĐỐI / ABSOLUTELY PROHIBITED
+-------------------------------------------------------------------------------
+
+Ngay cả khi đã được cho phép theo Mục 2, những việc sau vẫn bị cấm trừ khi văn
+bản cho phép nêu rõ TỪNG việc:
+
+  (a) phân phối lại, xuất bản, hoặc công khai Phần mềm hay bất kỳ phần nào của
+      nó, kể cả trong một repository nội bộ mà người ngoài phạm vi cho phép đọc
+      được;
+  (b) bán, cho thuê, cấp phép lại, hoặc cung cấp Phần mềm như một sản phẩm hoặc
+      dịch vụ;
+  (c) tạo và phân phối công trình phái sinh, kể cả khi đã đổi tên, viết lại, hoặc
+      dịch sang ngôn ngữ/định dạng khác;
+  (d) gỡ, che, hoặc sửa đổi thông báo bản quyền, tệp giấy phép, hoặc
+      `THIRD-PARTY-NOTICES.md`;
+  (e) dùng Phần mềm làm dữ liệu huấn luyện, tinh chỉnh, hoặc chưng cất cho bất kỳ
+      mô hình học máy nào;
+  (f) dùng tên "cc-harness" hoặc tên của Chủ sở hữu để tiếp thị bất kỳ sản phẩm
+      hoặc dịch vụ nào.
+
+Even where permission under Section 2 has been granted, the following remain
+prohibited unless the written permission expressly names each one: (a) redistribu-
+ting or publishing the Software or any part of it, including in an internal
+repository readable beyond the permitted scope; (b) selling, renting,
+sublicensing, or offering the Software as a product or service; (c) creating and
+distributing derivative works, including renamed, rewritten, or translated ones;
+(d) removing, obscuring, or altering copyright notices, this Licence, or
+`THIRD-PARTY-NOTICES.md`; (e) using the Software as training, fine-tuning, or
+distillation data for any machine-learning model; (f) using the name
+"cc-harness" or the Owner's name to market any product or service.
+
+-------------------------------------------------------------------------------
+5. XIN PHÉP / REQUESTING PERMISSION
+-------------------------------------------------------------------------------
+
+Liên hệ Chủ sở hữu qua repository của Phần mềm. Cho phép phải ở dạng văn bản, nêu
+rõ: ai được dùng, dùng cho việc gì, trong phạm vi nào, và trong thời hạn nào.
+
+Contact the Owner through the Software's repository. Permission must be in
+writing and must state who may use it, for what, within what scope, and for how
+long.
+
+-------------------------------------------------------------------------------
+6. CHẤM DỨT / TERMINATION
+-------------------------------------------------------------------------------
+
+Cho phép theo Mục 2 chấm dứt NGAY LẬP TỨC và tự động khi bạn vi phạm bất kỳ điều
+khoản nào của giấy phép này. Chủ sở hữu cũng có thể thu hồi cho phép bằng thông
+báo văn bản. Khi cho phép chấm dứt, bạn phải ngừng sử dụng và xoá mọi bản sao
+Phần mềm đang giữ.
+
+Permission under Section 2 terminates immediately and automatically upon any
+breach. The Owner may also revoke permission by written notice. On termination,
+you must cease all use and delete all copies in your possession.
+
+-------------------------------------------------------------------------------
+7. KHÔNG BẢO HÀNH / NO WARRANTY
+-------------------------------------------------------------------------------
+
+PHẦN MỀM ĐƯỢC CUNG CẤP "NGUYÊN TRẠNG", KHÔNG KÈM BẢO HÀNH DƯỚI BẤT KỲ HÌNH THỨC
+NÀO, DÙ RÕ RÀNG HAY HÀM Ý, BAO GỒM NHƯNG KHÔNG GIỚI HẠN CÁC BẢO HÀNH VỀ KHẢ NĂNG
+THƯƠNG MẠI, SỰ PHÙ HỢP CHO MỘT MỤC ĐÍCH CỤ THỂ, VÀ KHÔNG VI PHẠM QUYỀN CỦA NGƯỜI
+KHÁC.
+
+Phần mềm này điều phối các agent tự động chạy lệnh và sửa tệp trên máy bạn. Bạn
+chịu toàn bộ rủi ro về việc chạy nó.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. This Software orchestrates
+automated agents that run commands and modify files on your machine. You assume
+all risk of running it.
+
+-------------------------------------------------------------------------------
+8. GIỚI HẠN TRÁCH NHIỆM / LIMITATION OF LIABILITY
+-------------------------------------------------------------------------------
+
+TRONG MỌI TRƯỜNG HỢP, CHỦ SỞ HỮU KHÔNG CHỊU TRÁCH NHIỆM VỀ BẤT KỲ KHIẾU NẠI,
+THIỆT HẠI, MẤT MÁT DỮ LIỆU, HAY TRÁCH NHIỆM NÀO KHÁC, DÙ TRONG HỢP ĐỒNG, NGOÀI
+HỢP ĐỒNG, HAY BẤT KỲ CƠ SỞ NÀO KHÁC, PHÁT SINH TỪ HOẶC LIÊN QUAN ĐẾN PHẦN MỀM
+HOẶC VIỆC SỬ DỤNG PHẦN MỀM.
+
+IN NO EVENT SHALL THE OWNER BE LIABLE FOR ANY CLAIM, DAMAGES, DATA LOSS, OR
+OTHER LIABILITY, WHETHER IN CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR
+IN CONNECTION WITH THE SOFTWARE OR THE USE OF THE SOFTWARE.

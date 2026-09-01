@@ -1,0 +1,15 @@
+{
+  "name": "members-cc-harness",
+  "description": "Bộ khung quy trình Claude Code dạng plugin — cài một lần per máy, mọi dự án dùng chung, mỗi dự án tuỳ biến bằng claude_config.json.",
+  "owner": {
+    "name": "TanTranDev"
+  },
+  "plugins": [
+    {
+      "name": "cc-harness",
+      "source": "./",
+      "version": "1.1.0",
+      "description": "Workflow bắt buộc, subagents, hooks, gate. Route design system theo claude_config.json của từng dự án."
+    }
+  ]
+}

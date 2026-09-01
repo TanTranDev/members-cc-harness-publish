@@ -1,0 +1,178 @@
+{
+  "_ghi_chú": [
+    "Mọi đường dẫn dùng ${CLAUDE_PLUGIN_ROOT} — hook là tài sản của PLUGIN, không phải của repo dự án.",
+    "Khai một hook chưa chạy được thì mỗi phiên nhận một lỗi câm, nên nếu tạm gỡ hook nào ra khỏi đây",
+    "thì phải ghi lý do NGAY TẠI ĐÂY.",
+    "",
+    "ĐÃ GỠ (v1.1.0):",
+    "  superpowers-session-start.sh — bơm NGUYÊN VĂN skills/using-superpowers/SKILL.md (5,4 KB) vào",
+    "  mọi phiên. Ba lý do gỡ: (1) Claude Code đã tự liệt kê skill của plugin nên phần 'cách truy cập",
+    "  skill' là trùng; (2) ba luật còn giá trị đã chuyển vào bộ luật §9 — invoke chủ động, thứ tự ưu",
+    "  tiên khi mâu thuẫn, và namespace; (3) primer đó dạy \"Announce: Using [skill] to [purpose]\",",
+    "  MÂU THUẪN thẳng với §0 Luật output (tên skill là quá trình vận hành, không vào response).",
+    "  Skill vẫn còn và vẫn invoke được — chỉ không auto-bơm nữa.",
+    "",
+    "THÊM (v1.1.0): UserPromptSubmit → cbm-graph-first-rearm.sh. Cổng \"graph trước\" nay vũ trang theo",
+    "  MỘT YÊU CẦU CỦA USER, không theo một phiên: giá để thoát cổng cho cả phiên từng là ĐÚNG MỘT lời",
+    "  gọi search_graph. Nhánh SessionStart(clear|compact) giữ nguyên vì /clear không sinh",
+    "  UserPromptSubmit ngay.",
+    "",
+    "THÊM (v1.1.0): agent-tasks-gate.sh ở HAI chỗ — matcher Edit|Write|MultiEdit (chặn) và",
+    "  mcp__agent-tasks__.* (mở khoá). Tên tool tra từ mã nguồn plugin agent-tasks 0.1.12,",
+    "  KHÔNG đoán: matcher đoán sai là cổng câm 100%. Vũ trang lại dùng CHUNG",
+    "  cbm-graph-first-rearm.sh (UserPromptSubmit) — cùng khuôn khoá-theo-yêu-cầu."
+  ],
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/rules-inject.sh\"",
+            "async": false
+          }
+        ]
+      },
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-autosync-hook.sh\""
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-project-hint.sh\"",
+            "async": false
+          }
+        ]
+      },
+      {
+        "matcher": "clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first-rearm.sh\"",
+            "async": false
+          }
+        ]
+      },
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/policy-session-start.sh\"",
+            "async": false
+          }
+        ]
+      },
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/setup-check-session-start.sh\"",
+            "async": false
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/changelog-entry-gate.sh\""
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/component-test-gate.sh\""
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/design-gate.sh\""
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\""
+          }
+        ]
+      },
+      {
+        "matcher": "Grep|Glob|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first.sh\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-augment.sh\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__codebase-memory-mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first.sh\"",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-project-guard.sh\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/config-mode-agent-guard.sh\"",
+            "async": false
+          }
+        ]
+      },
+      {
+        "matcher": "mcp__agent-tasks__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-autosync-hook.sh\""
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first-rearm.sh\"",
+            "async": false
+          }
+        ]
+      }
+    ]
+  }
+}
