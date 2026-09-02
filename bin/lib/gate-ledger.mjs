@@ -44,13 +44,35 @@ export function snapshot(root) {
 }
 
 /**
+ * NGUỒN SỰ THẬT của công thức shell tương đương `dirtyHash`. Bản in trong §10 là BẢN CHÉP để đọc;
+ * bản chạy được là hằng số này, và `cc-harness stamp --verify-formula` chạy nó rồi so với
+ * `dirtyHash` — nên hai cách tính không còn phải giữ khớp bằng mắt.
+ *
+ * ⚠️ Khác bản §10 ĐỜI ĐẦU ở đúng một chỗ, và chỗ đó là một BUG ĐÃ ĐO (2026-09-02, git 2.48,
+ * Git Bash/Windows): `shasum <f>` in `<sha> *<f>` — dấu cách + DẤU SAO (chế độ nhị phân) — thay vì
+ * `<sha>  <f>` hai dấu cách như macOS/Linux. Digest nội dung y hệt, nhưng một byte phân cách khác
+ * là đủ làm hash NGOÀI lệch ⇒ ở Windows công thức cũ KHÔNG BAO GIỜ khớp sổ, tức hợp đồng "gate chạy
+ * đúng một lần" âm thầm không áp trên nền tảng đó. Dựng lại dòng bằng `printf` cho ra byte giống
+ * nhau ở MỌI nền tảng, và trên macOS thì KHÔNG đổi gì (ở đó `shasum` vốn đã in hai dấu cách).
+ *
+ * `awk '{print $1}'` ở ngoài cùng chỉ cắt phần hex khỏi `<sha>  -` — thứ mà người đọc vẫn tự cắt
+ * bằng mắt. Nó làm giá trị in ra khớp ĐÚNG thứ `dirtyHash` trả về, không thêm phép biến đổi nào.
+ */
+export const DIRTY_FORMULA = "{ git diff HEAD; git ls-files --others --exclude-standard"
+  + " | LC_ALL=C sort | while read -r f; do printf '%s  %s\\n'"
+  + " \"$(shasum \"$f\" | awk '{print $1}')\" \"$f\"; done; } | shasum | awk '{print $1}'";
+
+/**
  * DIRTY theo ĐÚNG công thức của §0 — hash NỘI DUNG, không phải danh sách đường dẫn:
  *   { git diff HEAD; git ls-files --others --exclude-standard | LC_ALL=C sort |
  *     while read -r f; do shasum "$f"; done; } | shasum
  * Phải khớp TỪNG BYTE với bản shell, vì vai đến sau đối soát bằng CHÍNH lệnh shell đó:
  *  • `LC_ALL=C sort` = thứ tự BYTE ⇒ so bằng `Buffer.compare`, KHÔNG dùng so chuỗi UTF-16 của JS
  *    (hai thứ lệch nhau ở ký tự ngoài BMP ⇒ hash lệch mà không ai đoán ra vì sao);
- *  • `shasum <f>` in `<sha1>  <f>\n` — HAI dấu cách; sai một dấu cách là lệch hash;
+ *  • dòng mỗi tệp là `<sha1>  <f>\n` — HAI dấu cách; sai một dấu cách là lệch hash. Giữ nguyên hai
+ *    dấu cách kể cả khi `shasum` ở máy bạn in khác (xem `DIRTY_FORMULA` ngay trên): bên phải sửa là
+ *    phía shell, không phải phía này. `cc-harness stamp --verify-formula` canh hai bên còn khớp;
+
  *  • tệp không đọc được ⇒ bản shell in lỗi ra stderr và KHÔNG góp gì vào stdout ⇒ ta cũng bỏ qua
  *    để giữ khớp, nhưng NÓI RA.
  */
@@ -73,14 +95,117 @@ function dirtyHash(root, git) {
 }
 
 /**
+ * Bản đồ `đường dẫn → chữ ký nội dung` cho MỌI tệp đang làm cây bẩn, kèm HEAD tại thời điểm chụp.
+ *
+ * KHÁC `dirtyHash`, và KHÔNG thay được cho nhau:
+ *  • `dirtyHash` = MỘT hash cho cả cây. Nó là HỢP ĐỒNG với công thức shell ở §10 (vai đến sau đối
+ *    soát bằng chính lệnh shell đó) ⇒ **CẤM đụng vào**;
+ *  • bản đồ này = TỪNG đường dẫn, chỉ để so HAI thời điểm rồi nói ra đường dẫn nào đã lệch.
+ *
+ * Rẻ hơn `dirtyHash` một bậc vì chỉ đọc những tệp ĐANG bẩn, không đọc mọi tệp chưa-theo-dõi. Nhờ
+ * vậy chụp thêm một mốc TRƯỚC khi chạy lệnh không làm gate chậm gấp đôi — nếu phải trả giá đó thì
+ * phép chẩn đoán này không đáng, và người ta sẽ tắt nó.
+ *
+ * @returns {{head:string|null, map:Map<string,string>|null, why:string}}
+ */
+export function dirtySnapshot(root) {
+  const git = (...args) => execFileSync('git', ['-C', root, ...args],
+    { encoding: 'buffer', maxBuffer: 512 * 1024 * 1024, stdio: ['pipe', 'pipe', 'ignore'] });
+  try {
+    const head = String(git('rev-parse', 'HEAD')).trim();
+    const lines = (out) => String(out).split('\n').filter((f) => f !== '');
+    const paths = [
+      ...lines(git('diff', '--name-only', 'HEAD')),
+      ...lines(git('ls-files', '--others', '--exclude-standard')),
+    ];
+    const map = new Map();
+    for (const f of paths) {
+      // Tệp KHÔNG đọc được / đã xoá vẫn là một lệch ⇒ ghi bằng giá trị canh chừng, KHÔNG bỏ qua:
+      // bỏ qua thì "lệnh gate xoá mất một tệp" trông y hệt "không có gì xảy ra".
+      let sig;
+      try { sig = sha1(fs.readFileSync(path.join(root, f))); }
+      catch { sig = '∅ không đọc được / đã xoá'; }
+      map.set(f, sig);
+    }
+    return { head, map, why: '' };
+  } catch (e) {
+    return { head: null, map: null, why: e instanceof Error ? e.message.split('\n')[0] : String(e) };
+  }
+}
+
+/**
+ * Đường dẫn có chữ ký KHÁC nhau giữa hai mốc — gồm cả xuất hiện mới lẫn biến mất.
+ * Sắp theo thứ tự BYTE cho khớp quy ước của `dirtyHash` (so chuỗi UTF-16 của JS lệch ở ký tự
+ * ngoài BMP). `null` = thiếu một trong hai mốc, tức KHÔNG so được — khác hẳn "so xong, không lệch".
+ * @returns {string[]|null}
+ */
+export function pathsChanged(before, after) {
+  if (!before || !after) return null;
+  const out = [];
+  for (const k of new Set([...before.keys(), ...after.keys()])) {
+    if (before.get(k) !== after.get(k)) out.push(k);
+  }
+  return out.sort((a, b) => Buffer.compare(Buffer.from(a, 'utf8'), Buffer.from(b, 'utf8')));
+}
+
+/**
+ * Toàn bộ diff của tệp ĐÃ THEO DÕI có phải chỉ là CR ở cuối dòng không?
+ *
+ * Đây là câu trả lời cho đúng ca đã trả giá thật: cây báo DIRTY sau mỗi lần build trong khi nội
+ * dung y hệt HEAD, chỉ khác quy ước xuống dòng. Không có dòng này thì `DIRTY: <hash>` là một con
+ * số đục — người đọc biết cây bẩn mà không biết bẩn vì cái gì.
+ *
+ * @returns {boolean|null} `null` = không hỏi được git (KHÔNG phải "không có")
+ */
+export function eolOnlyDiff(root) {
+  const git = (...args) => execFileSync('git', ['-C', root, ...args],
+    { encoding: 'buffer', maxBuffer: 512 * 1024 * 1024, stdio: ['pipe', 'pipe', 'ignore'] });
+  try {
+    // Không có diff thì không có gì để nói — trả `false`, KHÔNG phải `true` (một diff RỖNG thoả
+    // "rỗng sau khi bỏ qua CR" một cách tầm thường, và khai điều đó là khai một chuyện vô nghĩa).
+    if (git('diff', 'HEAD').length === 0) return false;
+    return git('diff', 'HEAD', '--ignore-cr-at-eol').length === 0;
+  } catch {
+    return null;
+  }
+}
+
+/**
  * Dựng phần MÁY-ĐỌC của sổ. Phần KHAI là chữ của NGƯỜI và ở lại chính tệp này: `code-reviewer` đọc
  * mục khai TRƯỚC khi review, mà changelog thì viết SAU review — để khai ở changelog là tạo vòng lặp
  * chết, reviewer không còn gì để đọc. Máy chỉ chừa CHỖ, không viết hộ.
  */
-export function renderLedger({ root, results, head, dirty, why, outIgnore, ignoreWhy }) {
+export function renderLedger({
+  root, results, head, dirty, why, outIgnore, ignoreWhy,
+  gateTouched = null, eolOnly = null, diagWhy = '', headMoved = false,
+}) {
   const na = (r) => `KHÔNG XÁC ĐỊNH — ${r}`;
   const w = Math.max(...results.map((r) => r.cmd.length));
   const lines = [`HEAD:  ${head ?? na(why)}`, `DIRTY: ${dirty ?? na(why)}`];
+
+  // BỐN dòng dưới đây chỉ xuất hiện KHI CÓ CHUYỆN. Sổ lành ⇒ không thêm một byte nào: mỗi dòng ở
+  // đây đều bị đọc lại bởi vai đến sau, nên "khai cho đủ nghi thức" là thuế thu trên mọi lô.
+  if (headMoved) {
+    lines.push('DIRTY-BY-GATE: ⚠ lệnh gate đã ĐỔI HEAD — mốc trên là mốc SAU khi nó đổi, không phải'
+      + ' mốc của diff mà lô này định chứng minh.');
+  }
+  if (gateTouched && gateTouched.length) {
+    const shown = gateTouched.slice(0, 5);
+    const more = gateTouched.length - shown.length;
+    lines.push(`DIRTY-BY-GATE: ${gateTouched.length} tệp do CHÍNH lệnh gate sửa — ${shown.join(' · ')}`
+      + `${more > 0 ? ` · … (+${more})` : ''}`);
+  }
+  if (eolOnly === true) {
+    lines.push('DIRTY-EOL: toàn bộ diff của tệp ĐÃ THEO DÕI chỉ là CR cuối dòng — nội dung y hệt'
+      + ' HEAD. Kiểm `core.autocrlf` và quy tắc `text` của `.gitattributes` trước khi đi tìm thay đổi.');
+  }
+  if (diagWhy) {
+    // §0 "guard không được im": bỏ qua vì thiếu tiền đề thì PHẢI nói ra. Không có dòng này thì
+    // "không so được" trông y hệt "so xong, không có gì" — đúng lớp lỗi đắt nhất của bộ khung.
+    lines.push(`DIRTY-BY-GATE: KHÔNG so được hai mốc (${diagWhy}) ⇒ lưới "lệnh gate có tự làm bẩn`
+      + ' cây không" KHÔNG chạy ở lượt này.');
+  }
+
   for (const r of results) {
     lines.push(`- ${r.cmd.padEnd(w)}  → exit ${r.code}${r.tapFail ? '  ⚠ TAP báo FAIL dù exit 0' : ''}`);
     for (const t of r.tail) lines.push(`    | ${t}`);

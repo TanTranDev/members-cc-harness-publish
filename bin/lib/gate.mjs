@@ -7,7 +7,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync, execFileSync } from 'node:child_process';
 
-import { canOverwrite, snapshot, renderLedger } from './gate-ledger.mjs';
+import {
+  canOverwrite, snapshot, renderLedger, dirtySnapshot, pathsChanged, eolOnlyDiff,
+} from './gate-ledger.mjs';
 
 const TAIL_LINES = 3;
 const TAIL_COLS = 200;
@@ -104,6 +106,17 @@ export function runGate({ root, config, out, run }) {
 
   const exec = run ?? ((cmd) => spawnSync(cmd, { cwd: root, shell: true, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 }));
 
+  // Mốc TRƯỚC — chụp NGAY TRƯỚC lệnh đầu tiên.
+  //
+  // Không có nó, gate KHÔNG phân biệt được "cây bẩn sẵn từ trước" với "chính lệnh của tôi vừa làm
+  // bẩn". Mà gate là tool DUY NHẤT vừa chạy build vừa đo cây — nó nắm cả hai nửa bằng chứng, chụp
+  // mỗi mốc SAU là tự vứt đi một nửa. Đã trả giá thật: một tệp sinh tự động được build ghi lại ở
+  // mỗi lượt gate ⇒ ledger báo DIRTY trong khi nội dung y hệt HEAD, không ai biết vì sao.
+  //
+  // Cùng lớp lý lẽ với lưới `outIgnore` ngay trên: cả hai đều là "tác dụng phụ của gate làm hỏng
+  // mốc của chính gate". Lưới kia canh cuốn sổ; lưới này canh dãy lệnh.
+  const pre = dirtySnapshot(root);
+
   const results = [];
   for (const cmd of commands) {
     const r = exec(cmd);
@@ -125,9 +138,54 @@ export function runGate({ root, config, out, run }) {
   // Chụp mốc — BƯỚC CUỐI CÙNG, sau khi MỌI lệnh đã chạy xong.
   const { head, dirty, why: snapWhy } = snapshot(root);
 
+  // Chẩn đoán thêm. Toàn bộ khối này CHỈ ĐỌC và được bọc kín: nó KHÔNG được phép đổi mã thoát của
+  // gate. Một phép chẩn đoán làm hỏng cổng nó đang phục vụ thì tệ hơn hẳn việc không có nó.
+  let gateTouched = null;
+  let eolOnly = null;
+  let diagWhy = '';
+  let headMoved = false;
+  try {
+    const post = dirtySnapshot(root);
+    if (!pre.map || !post.map) diagWhy = pre.why || post.why || 'không rõ nguyên nhân';
+    else {
+      gateTouched = pathsChanged(pre.map, post.map);
+      headMoved = Boolean(pre.head && post.head && pre.head !== post.head);
+    }
+    eolOnly = eolOnlyDiff(root);
+  } catch (e) {
+    diagWhy = e instanceof Error ? e.message.split('\n')[0] : String(e);
+    gateTouched = null;
+  }
+  // Mốc chính đã hỏng ⇒ gate đã fail-closed và nói lý do ở dưới. Nhắc lại cùng một nguyên nhân ở
+  // dòng chẩn đoán là thêm chữ chứ không thêm tin.
+  if (snapWhy) diagWhy = '';
+
   fs.mkdirSync(path.dirname(outAbs), { recursive: true });
-  fs.writeFileSync(outAbs, renderLedger({ root, results, head, dirty, why: snapWhy, outIgnore, ignoreWhy }));
+  fs.writeFileSync(outAbs, renderLedger({
+    root, results, head, dirty, why: snapWhy, outIgnore, ignoreWhy,
+    gateTouched, eolOnly, diagWhy, headMoved,
+  }));
   lines.push(`gate: sổ → ${outAbs}`, `  root: ${root}`);
+
+  if (headMoved) {
+    lines.push('⚠ gate: lệnh gate đã ĐỔI HEAD giữa chừng ⇒ mốc trong sổ là mốc SAU khi nó đổi.');
+  }
+  if (gateTouched && gateTouched.length) {
+    const shown = gateTouched.slice(0, 5);
+    const more = gateTouched.length - shown.length;
+    lines.push(`⚠ gate: CHÍNH lệnh gate vừa làm bẩn cây — ${gateTouched.length} tệp: `
+      + `${shown.join(' · ')}${more > 0 ? ` · … (+${more})` : ''}`);
+    lines.push('  Sinh lại tệp ĐÃ THEO DÕI ở mỗi lượt gate ⇒ ledger báo DIRTY dù nội dung có thể y'
+      + ' hệt HEAD. Chọn một: gitignore chúng · commit bản mới · nếu chỉ khác line-endings thì sửa'
+      + ' quy tắc `text` trong `.gitattributes` (`cc-harness doctor` chỉ đúng chỗ).');
+  }
+  if (eolOnly === true) {
+    lines.push('⚠ gate: toàn bộ diff của tệp ĐÃ THEO DÕI chỉ là CR cuối dòng — nội dung y hệt HEAD.');
+  }
+  if (diagWhy) {
+    lines.push(`⚠ gate: KHÔNG so được mốc trước/sau (${diagWhy}) ⇒ lưới "lệnh gate có tự làm bẩn cây`
+      + ' không" KHÔNG chạy ở lượt này.');
+  }
 
   if (outIgnore === 'no') {
     lines.push(`⚠ gate: ${outAbs} KHÔNG bị cấu hình theo dõi tệp bỏ qua ⇒ sổ vừa ghi tự làm DIRTY ở`

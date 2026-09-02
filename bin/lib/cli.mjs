@@ -17,6 +17,7 @@ import { checkSpecs } from './spec.mjs';
 import { viewChangelog } from './changelog.mjs';
 import { observe } from './observe.mjs';
 import { runGate } from './gate.mjs';
+import { runStamp } from './stamp.mjs';
 import { exportRunner } from './export.mjs';
 import { resolvePolicy, setMode } from './policy-resolve.mjs';
 import { renderPolicyBlock, KNOWN_MODES } from './policy.mjs';
@@ -43,6 +44,9 @@ Lệnh:
   observe [--probe|<slug> [-- <lệnh>]]
                           bằng chứng quan sát (KHÔNG bao giờ chặn task — luôn exit 0)
   gate --out <path>       chạy gate.commands tuần tự + ghi ledger bằng chứng
+  stamp [<ledger>]        in mốc HEAD/DIRTY; kèm đường dẫn sổ ⇒ ĐỐI SOÁT rồi báo KHỚP/LỆCH
+  stamp --formula         in công thức shell chuẩn của DIRTY (nguồn sự thật, để dán vào shell)
+  stamp --verify-formula  kiểm công thức shell và cách tính của máy còn cho cùng giá trị không
   export                  sinh bản chạy độc lập vào script/ cho CI (bản ĐỨNG YÊN)
   policy --check|--render|--mode|--set-mode <m>
                           tham số vận hành 3 tầng (defaults ← dự án ← clone)
@@ -87,10 +91,28 @@ export function main(argv, io = console) {
     return r.fail ? 1 : 0;
   }
 
+  // `stamp --formula` chỉ in một HẰNG SỐ của bộ khung — nó không nói gì về cây nào cả, nên bắt nó
+  // phân giải root là bắt người dùng phải đứng trong một dự án mới xem được công thức. Đặt TRƯỚC
+  // `resolveRoot` vì mọi mode khác của `stamp` thì root là bắt buộc và nghiêm ngặt.
+  if (command === 'stamp' && flags.has('--formula')) {
+    const r = runStamp({ root: null, mode: 'formula' });
+    for (const l of r.lines) io.log(l);
+    return r.code;
+  }
+
   // Lệnh CỔNG không phân giải được root ⇒ TỪ CHỐI: quét/chấm một cây rỗng rồi báo xanh đúng là
   // false-green. Lệnh tư vấn (`doctor`, `rules`, `config`, `changelog`) lùi về cwd kèm cảnh báo.
-  const GATE_COMMANDS = new Set(['structure', 'spec', 'gate']);
-  const rr = resolveRoot({ argRoot: opts.root, cwd: process.cwd(), gate: GATE_COMMANDS.has(command) });
+  //
+  // `stamp` thuộc nhóm CỔNG: kết quả của nó quyết định "có phải chạy lại gate không". Phân giải
+  // nhầm cây ⇒ báo KHỚP cho một cây khác ⇒ land bằng chứng của sai cây.
+  const GATE_COMMANDS = new Set(['structure', 'spec', 'gate', 'stamp']);
+  // NGOẠI LỆ: `stamp --verify-formula` là lưới TỰ KIỂM của bộ khung, không phải lời khẳng định về
+  // một dự án — nó chỉ hỏi "hai cách tính có còn cho cùng giá trị không". Bắt nó đòi
+  // claude_config.json làm lưới KHÔNG chạy được ở chính repo cc-harness, tức nơi DUY NHẤT người ta
+  // sửa công thức. Một cái lưới vắng mặt đúng lúc cần là không có lưới.
+  const strictRoot = GATE_COMMANDS.has(command)
+    && !(command === 'stamp' && flags.has('--verify-formula'));
+  const rr = resolveRoot({ argRoot: opts.root, cwd: process.cwd(), gate: strictRoot });
   if (!rr.ok) { io.error(`✖ cc-harness ${command}: ${rr.message}`); return 2; }
   if (rr.warning) io.error(`⚠ cc-harness ${command}: ${rr.warning}`);
   const root = rr.root;
@@ -165,6 +187,13 @@ export function main(argv, io = console) {
   if (command === 'gate') {
     const r = runGate({ root, config: loadConfig(root).config, out: opts.out });
     for (const l of r.lines) (r.fail ? io.error : io.log)(l);
+    return r.code;
+  }
+
+  if (command === 'stamp') {
+    const mode = flags.has('--verify-formula') ? 'verify' : (positional[1] ? 'compare' : 'print');
+    const r = runStamp({ root, ledgerPath: positional[1], mode });
+    for (const l of r.lines) (r.code === 0 ? io.log : io.error)(l);
     return r.code;
   }
 

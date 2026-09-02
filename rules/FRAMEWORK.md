@@ -359,6 +359,7 @@ cc-harness rules --index         # bảng mục: id · tầng · dùng khi nào
 cc-harness rules §2             # in ĐÚNG một mục (đã trộn override của dự án)
 cc-harness rules --list-sections # bảng section-id để khai override
 cc-harness gate                  # chạy gate.commands của dự án + ghi ledger
+cc-harness stamp <sổ>            # đối soát mốc HEAD/DIRTY với ledger — KHỚP thì đừng chạy lại gate
 cc-harness structure             # structure health check (ratchet — xem §2)
 cc-harness spec                  # kiểm format spec hành vi (§10 "Spec hành vi")
 cc-harness observe               # bằng chứng quan sát (§12 "Quan sát") — không bao giờ chặn task
@@ -823,7 +824,12 @@ Cơ chế bắt buộc khi fan-out:
 
 ```
 HEAD:  <git rev-parse HEAD>
-DIRTY: <{ git diff HEAD; git ls-files --others --exclude-standard | LC_ALL=C sort | while read -r f; do shasum "$f"; done; } | shasum>
+DIRTY: <{ git diff HEAD; git ls-files --others --exclude-standard | LC_ALL=C sort | while read -r f; do printf '%s  %s\n' "$(shasum "$f" | awk '{print $1}')" "$f"; done; } | shasum | awk '{print $1}'>
+DIRTY-BY-GATE / DIRTY-EOL: <CHỈ xuất hiện khi có chuyện — `cc-harness gate` tự ghi, đừng gõ tay.
+       DIRTY-BY-GATE = chính lệnh gate vừa sửa những tệp này (build sinh lại tệp đã theo dõi ⇒ sổ
+       báo DIRTY dù nội dung có thể y hệt HEAD) · hoặc lệnh gate đã đổi HEAD · hoặc KHÔNG so được
+       hai mốc và vì sao. DIRTY-EOL = toàn bộ diff của tệp đã theo dõi chỉ là CR cuối dòng.
+       Sổ lành thì KHÔNG có dòng nào trong nhóm này.>
 - npm run typecheck  → exit 0
 - npm run lint       → exit 0 (0 error / N warning)
 - npm test           → exit 0 (X/Y pass)
@@ -851,7 +857,23 @@ QUAN SÁT (chỉ việc có bề mặt quan sát được): L3 — bằng chứn
 <trích output tóm tắt — lấy từ `rtk proxy` hoặc lệnh thô, KHÔNG dán bản rút gọn>
 ```
 
-Vai đến sau (code-reviewer, main) chạy lại 2 lệnh HEAD/DIRTY để đối chiếu: **khớp ⇒ trích ledger làm bằng chứng, KHÔNG chạy lại gate**; lệch (code đã đổi sau verify) ⇒ gate phải chạy lại + ghi ledger mới. Đây là cách thỏa skill `cc-harness:verification-before-completion` mà không đốt lặp.
+⚠️ **`printf` trong công thức KHÔNG phải để cho đẹp — bỏ nó đi là tái tạo lại một bug đã đo.** Bản
+đời đầu viết thẳng `shasum "$f"`. Trên **Git Bash/Windows** (đo 2026-09-02, git 2.48) lệnh đó in
+`<sha> *<f>` — dấu cách + **DẤU SAO**, chế độ nhị phân — chứ không phải `<sha>  <f>` hai dấu cách như
+macOS/Linux. Digest nội dung y hệt, nhưng một byte phân cách khác đủ làm hash NGOÀI lệch ⇒ ở Windows
+công thức **không bao giờ** khớp `DIRTY:` do gate ghi, tức hợp đồng *"gate chạy đúng một lần"* âm
+thầm không áp ở đó suốt từ đầu. Dựng lại dòng bằng `printf` cho ra byte giống nhau ở MỌI nền tảng, và
+trên macOS thì không đổi gì.
+
+**Đừng gõ tay công thức này nếu không cần.** Bản in ở đây là **bản chép để đọc**; nguồn sự thật là
+hằng số trong máy, in ra bằng `cc-harness stamp --formula`, và `cc-harness stamp --verify-formula`
+kiểm hai cách tính còn cho cùng giá trị không — nên cặp này không còn phải giữ khớp bằng mắt.
+
+Vai đến sau (code-reviewer, main) đối chiếu bằng **`cc-harness stamp <đường dẫn sổ>`**: nó chụp mốc
+bằng ĐÚNG hàm mà gate dùng để ghi sổ, tự phân giải root, rồi báo thẳng KHỚP/LỆCH (exit 0/1) — dẹp
+cùng lúc cả ba bẫy của đường gõ tay (nền tảng · sai thư mục · chép nhầm hash). **Khớp ⇒ trích ledger
+làm bằng chứng, KHÔNG chạy lại gate**; lệch (code đã đổi sau verify) ⇒ gate phải chạy lại + ghi
+ledger mới. Đây là cách thỏa skill `cc-harness:verification-before-completion` mà không đốt lặp.
 
 ⚠️ **Chụp HEAD/DIRTY là bước CUỐI CÙNG** — sau changelog-writer, sau mọi edit của task (kể cả file docs được track). Chụp sớm rồi tree còn đổi ⇒ ledger tự vỡ (LEDGER-STALE) ở vai đến sau. File trong `docs-raw/`/`docs/wip/` đã gitignore nên ghi ledger không làm lệch hash. Công thức DIRTY hash **nội dung** (diff tracked + nội dung file untracked chưa ignore) — KHÔNG dùng `git status --porcelain | shasum` (chỉ hash danh sách đường dẫn, mù nội dung).
 
@@ -865,6 +887,8 @@ Vai đến sau (code-reviewer, main) chạy lại 2 lệnh HEAD/DIRTY để đ�
 **No silent skip — guard không được im lặng.** Mọi validator/gate/probe của bộ khung: bỏ qua vì **thiếu tiền đề** (thiếu file, thiếu công cụ, không phân giải được root, không đọc được git…) ⇒ **PHẢI nói ra** — WARN nêu rõ thiếu gì + cách sửa. **CẤM** đường "không kiểm được" mà vẫn `exit 0` không một dòng nào: đó chính là false-negative im lặng, loại lỗi đắt nhất (gate xanh nhưng chẳng kiểm gì — đã xảy ra 4 lần). Cổng (`cc-harness spec`, `cc-harness structure`, `cc-harness doctor`) ⇒ exit ≠ 0 khi không phân giải được đối tượng cần kiểm; tool advisory (``cc-harness observe``, `changelog-view`, `observe`) ⇒ WARN rồi tiếp tục, KHÔNG chặn task. Mọi tool in **root đã dùng** (xem `specs/project-root/spec.md`).
 
 **Chặn xoay vòng fix (3-strikes):** cùng một test fail với cùng một lỗi 3 lần liên tiếp ⇒ CẤM sửa tiếp — implementer trả `NEEDS_ADVICE`, main chuyển `debugger` hoặc hỏi user. (Tương tự quy tắc 3-giả-thuyết của debugger.)
+
+**Thao tác dọn tay lặp lại là một BUG REPORT, không phải thói quen.** Cùng một lệnh dọn để đi qua cùng một cổng (`git checkout -- <file>` sau mỗi lần build · xoá cache · sửa quyền) gõ tới lần thứ **HAI** ⇒ nêu ra ngay ở lượt đó, và **CẤM** ghi nó vào bản tóm tắt như một bước bình thường. Chi phí nêu là một dòng; chi phí hấp thụ là nó sống tới lúc chặn merge. Đã trả giá thật: một tệp sinh tự động báo modified sau mỗi lần build (line-endings, không phải nội dung) được `git checkout --` cho qua nhiều đợt liền, và ghi vào tóm tắt là *"chỉ là line-endings"* — tức đã bị phân loại thành chuyện bình thường thay vì một lỗi cần sửa.
 
 ### Có vào luồng review không — ĐÁNH GIÁ, không tra bảng
 

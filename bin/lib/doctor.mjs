@@ -160,6 +160,46 @@ export function doctor({ root, pluginRoot, home = os.homedir(), env = process.en
   }
   if (giUnknown) warn('không chạy được `git check-ignore` ⇒ KHÔNG kiểm được ba đường dẫn phải gitignore (§10)');
 
+  // ── EOL: KHÔNG có mục riêng, KHÔNG có dòng ✔ — chỉ nói khi có bất thường ──
+  //
+  // Vì sao im khi lành: mọi dòng ở đây đi thẳng vào context của MỌI phiên qua hook SessionStart.
+  // Một phép kiểm chỉ đáng tiền khi nó bắt được lỗi; in "✔ không sao" mỗi phiên là thuế thuần.
+  // Đây KHÔNG phải "silent skip" của §0: phép kiểm VẪN chạy, chỉ là không có gì để khai.
+  //
+  // Vì sao đáng kiểm: `autocrlf=true` + không có quy tắc `text` bao trùm ⇒ tệp do build SINH RA
+  // được ghi CRLF rồi git so với bản LF trong index ⇒ cây báo modified sau MỖI lần build dù nội
+  // dung y hệt HEAD. Đã trả giá thật: `routeTree.gen.ts` ở một dự án dùng bộ khung này báo
+  // modified suốt nhiều đợt, mỗi lần đều bị `git checkout --` cho qua, tới khi nó chặn merge.
+  //
+  // Hỏi GIT, KHÔNG đi tìm tệp `.gitattributes` — cùng lý lẽ với `check-ignore` ở trên: quy tắc
+  // `text` tới được từ `.gitattributes` của thư mục con, từ `info/attributes`, hay từ
+  // `core.attributesFile`. Tìm tệp ở root cho ra "thiếu" trong khi git vẫn đang chuẩn hoá.
+  //
+  // Chỉ chạy khi git DÙNG ĐƯỢC (`giUnknown` false — chính `check-ignore` ngay trên đã chứng minh
+  // điều đó). Git hỏng thì WARN phía trên đã nói rồi; thêm một dòng nữa là lặp, không phải thêm tin.
+  if (!giUnknown) {
+    const gitOut = (args) => {
+      try {
+        return execFileSync('git', ['-C', root, ...args], { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }).trim();
+      } catch {
+        // `config --get` thoát 1 khi khoá CHƯA ĐẶT — đó là câu trả lời hợp lệ, không phải lỗi.
+        return null;
+      }
+    };
+    const autocrlf = (gitOut(['config', '--get', 'core.autocrlf']) ?? '').toLowerCase();
+    if (autocrlf === 'true') {
+      // Tên tệp KHÔNG cần tồn tại — `check-attr` chỉ khớp pattern. Dùng một tên trung tính vì thứ
+      // cần đo là có quy tắc BAO TRÙM hay không, chứ không phải một đuôi cụ thể nào.
+      const attr = gitOut(['check-attr', 'text', '--', 'cc-harness-eol-probe.txt']) ?? '';
+      if (/:\s*text:\s*unspecified\s*$/.test(attr)) {
+        warn('EOL — `core.autocrlf=true` mà repo KHÔNG có quy tắc `text` bao trùm ⇒ tệp do build sinh'
+          + ' ra bị ghi CRLF rồi so với bản LF trong index: cây báo modified sau MỖI lần build dù nội'
+          + ' dung y hệt HEAD. Ledger đọc thành DIRTY, và người review đi tìm một thay đổi không tồn tại.');
+        warn('  Sửa: thêm `.gitattributes` với `* text=auto eol=lf`, rồi `git add --renormalize .`');
+      }
+    }
+  }
+
   // ── tích hợp ngoài ──
   const want = cfg.config?.integrations ?? {};
   const probes = {

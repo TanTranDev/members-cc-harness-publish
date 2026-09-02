@@ -1,0 +1,8 @@
+# Chuẩn hoá LF cho mọi tệp văn bản của bản phát hành.
+#
+# Plugin được cài bằng `git clone`. Máy Windows mặc định `core.autocrlf=true` nên checkout ra CRLF;
+# shebang `#!/usr/bin/env bash` mang `\r` thì shell của macOS/Linux báo `bad interpreter` và mọi hook
+# chết cùng lúc. Dòng dưới khoá quy ước về phía KHO, để nó không còn phụ thuộc cấu hình từng máy.
+#
+# KHÔNG có `export-ignore` nào ở đây, cố ý: repo này CHỈ chứa phần chạy, không có gì để loại trừ.
+* text=auto eol=lf
