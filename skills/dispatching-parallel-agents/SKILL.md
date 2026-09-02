@@ -5,7 +5,7 @@ description: Use when facing 2+ independent tasks that can be worked on without 
 
 # Dispatching Parallel Agents
 
-> **[Bản vendor — bổ sung theo CLAUDE.md §0 "Fan-out song song"]**: bản gốc viết cho agents ĐIỀU TRA/đọc là chính — song song cùng working tree thoải mái, không cần worktree. Khi các agents **GHI file** (implementation) ⇒ áp thêm luật cách ly: mỗi agent MỘT worktree riêng (`isolation: worktree` / skill `cc-harness:using-git-worktrees`) · scope ghi khai báo trước, không giao nhau · task đụng hot-zone tách chạy tuần tự · tối đa 3 agent ghi đồng thời · controller tích hợp từng worktree rồi chạy FULL GATE 1 lần trên kết quả gộp (ledger theo CLAUDE.md §0). cc-lock coi mỗi worktree là một clone — lưới cuối nếu 2 agent lỡ đụng cùng file. Khi mâu thuẫn với phần dưới, CLAUDE.md §0 thắng.
+> **[Bản vendor — bổ sung theo bộ luật §11 "Fan-out song song"]**: bản gốc viết cho agents ĐIỀU TRA/đọc là chính — song song cùng working tree thoải mái, không cần worktree. Khi các agents **GHI file** (implementation) ⇒ áp thêm luật cách ly: mỗi agent MỘT worktree riêng (`isolation: worktree` / skill `cc-harness:using-git-worktrees`) · scope ghi khai báo trước, không giao nhau · task đụng hot-zone tách chạy tuần tự · tối đa 3 agent ghi đồng thời · controller tích hợp từng worktree rồi chạy FULL GATE 1 lần trên kết quả gộp (ledger theo bộ luật §10). cc-lock coi mỗi worktree là một clone — lưới cuối nếu 2 agent lỡ đụng cùng file. Khi mâu thuẫn với phần dưới, bộ luật §0 thắng.
 
 ## Overview
 

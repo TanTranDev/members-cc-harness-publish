@@ -9,7 +9,7 @@ Bạn là advisor của dự án (xem PROJECT.md) — ý kiến độc lập th�
 
 ## Tra cứu & bằng chứng
 
-Theo bảng quyết định CLAUDE.md §7: graph (`trace_path`/`search_graph` — đã cấp trong `tools`) để tự kiểm chứng context được đưa thay vì tin mô tả suông; mọi lời khuyên dựa `file:line` đã `Read`; bằng chứng từ `rtk proxy`/lệnh thô.
+Theo bảng quyết định bộ luật §7: graph (`trace_path`/`search_graph` — đã cấp trong `tools`) để tự kiểm chứng context được đưa thay vì tin mô tả suông; mọi lời khuyên dựa `file:line` đã `Read`; bằng chứng từ `rtk proxy`/lệnh thô.
 
 ## Cách làm việc
 

@@ -1,6 +1,6 @@
 ---
 name: custom-claude-config-mode
-description: Chuyển công tắc quality/balance/usage cho bộ khung điều phối model (per-clone). Dùng khi user gõ /custom-claude-config-mode [quality|balance|usage], hoặc nói "đổi sang mode tiết kiệm / usage / balance / quality", "bật tiết kiệm usage", "về baseline chất lượng", "xem/đổi config-mode". quality = baseline CLAUDE.md §0 (mặc định). balance = mức giữa — model như quality nhưng ngân sách spawn siết như usage. usage = hạ model subagent xuống tier rẻ (delta). Triggers — config-mode, mode tiết kiệm, usage mode, balance mode, quality mode, tiết kiệm token/usage, đổi routing model.
+description: Chuyển công tắc quality/balance/usage cho bộ khung điều phối model (per-clone). Dùng khi user gõ /custom-claude-config-mode [quality|balance|usage], hoặc nói "đổi sang mode tiết kiệm / usage / balance / quality", "bật tiết kiệm usage", "về baseline chất lượng", "xem/đổi config-mode". quality = baseline bộ luật §11 (mặc định). balance = mức giữa — model như quality nhưng ngân sách spawn siết như usage. usage = hạ model subagent xuống tier rẻ (delta). Triggers — config-mode, mode tiết kiệm, usage mode, balance mode, quality mode, tiết kiệm token/usage, đổi routing model.
 ---
 
 # custom-claude-config-mode — công tắc quality/balance/usage
@@ -24,7 +24,7 @@ sự thật: lệnh `cc-harness policy` (resolver 3 tầng: plugin defaults ← 
 - **Có arg** `quality`, `balance` hoặc `usage` (từ `/custom-claude-config-mode <arg>` hoặc
   câu nói rõ ý) ⇒ dùng luôn, KHÔNG hỏi.
 - **Không arg / mơ hồ** ⇒ `AskUserQuestion` đúng 3 lựa chọn (mỗi lựa chọn nêu ĐƯỢC/MẤT):
-  - "quality — baseline CLAUDE.md §0 (mặc định). Được: chất lượng cao nhất, subagent thả ga. Mất: usage/token cao nhất."
+  - "quality — baseline bộ luật §11 (mặc định). Được: chất lượng cao nhất, subagent thả ga. Mất: usage/token cao nhất."
   - "balance — mức giữa. Được: model y hệt quality (không hạ tier vai nào). Mất: ngân sách spawn siết bằng usage, subagent hết thả ga."
   - "usage — tiết kiệm. Được: usage/token thấp nhất. Mất: subagent chạy model tier rẻ ở khúc gõ giữa (bất biến an toàn vẫn giữ)."
   Có thể kèm dòng phụ: mode hiện hành đọc bằng `cc-harness policy --mode`.
@@ -40,7 +40,7 @@ In cho user:
 
 1. **Xác nhận**: "config-mode giờ là **<mode>** cho clone này (state: `<git-dir>/config-mode-local.json`)."
 
-2. **Bảng DELTA** — chỉ in khi đặt `usage`. Đặt `quality` thì nói "về baseline CLAUDE.md §0,
+2. **Bảng DELTA** — chỉ in khi đặt `usage`. Đặt `quality` thì nói "về baseline bộ luật §11,
    không delta"; đặt `balance` thì nói "model giữ nguyên như `quality`, nhưng ngân sách spawn
    siết bằng `usage`" — CẤM bịa số, trỏ user đọc khối `⚙️ POLICY` đầu phiên:
 

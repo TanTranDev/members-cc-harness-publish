@@ -9,12 +9,12 @@ Dispatch a code reviewer subagent to catch issues before they cascade. The revie
 
 **Core principle:** Review đúng chỗ rủi ro — không review nghi thức.
 
-> **[Bản vendor đã điều chỉnh theo CLAUDE.md §0 "Verify & Review" — KHÁC bản plugin]**: review bắt buộc theo TIÊU CHÍ RỦI RO, không phải sau mỗi task. Reviewer KHÔNG chạy lại gate — đọc ledger `verify.md`.
+> **[Bản vendor đã điều chỉnh theo bộ luật §12 — KHÁC bản plugin]**: review bắt buộc theo TIÊU CHÍ RỦI RO, không phải sau mỗi task. Reviewer KHÔNG chạy lại gate — đọc ledger `verify.md`.
 
 ## When to Request Review
 
-**Mandatory (diff chạm ít nhất một cửa — CLAUDE.md §0):**
-- Vùng đắt (định nghĩa ở CLAUDE.md § Phân loại task — KHÁC hot-zone/single-writer) / contract MF / public API feature (`index.ts` export)
+**Mandatory (diff chạm ít nhất một cửa — bộ luật §12):**
+- Vùng đắt (định nghĩa ở bộ luật §0 "Phân loại việc" — KHÁC hot-zone/single-writer) / contract MF / public API feature (`index.ts` export)
 - \> 5 file hoặc > ~150 dòng · dependency mới · sửa `structure-baseline.json`
 - Before merge to main (diff tổng của branch)
 

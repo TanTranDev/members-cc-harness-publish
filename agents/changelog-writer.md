@@ -1,6 +1,6 @@
 ---
 name: changelog-writer
-description: Ghi 1 entry changelog dạng FRAGMENT (file mới docs/releases/entries/YYYYMM/YYYYMMDD-HHMMSS-<slug>.md) sau khi một task hình dạng CHIA/CHỐT RỒI GIAO/CHIA RỒI BÓC hoàn tất, hoặc khi user yêu cầu "ghi changelog". Chỉ ghi tài liệu changelog, không sửa code. Main agent tự spawn agent này khi task đó hoàn tất (bộ luật §0); cấp LÀM LUÔN thì main tự ghi, KHÔNG spawn.
+description: Ghi 1 entry changelog dạng FRAGMENT (file mới docs/releases/entries/YYYYMM/YYYYMMDD-HHMMSS-<slug>.md) sau khi một task hình dạng CHIA/CHỐT RỒI GIAO/CHIA RỒI BÓC hoàn tất, hoặc khi user yêu cầu "ghi changelog". Chỉ ghi tài liệu changelog, không sửa code. Main agent tự spawn agent này khi task đó hoàn tất (bộ luật §10); cấp LÀM LUÔN thì main tự ghi, KHÔNG spawn.
 tools: Read, Glob, Grep, Bash, Write
 model: haiku
 ---

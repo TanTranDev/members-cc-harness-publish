@@ -5,9 +5,9 @@ description: Use when executing implementation plans with independent tasks in t
 
 # Subagent-Driven Development
 
-> **[Bản vendor đã điều chỉnh theo bộ luật §0 "Verify & Review" — KHÁC bản plugin]**: review theo RỦI RO thay vì sau mỗi task; MỘT lượt review gộp spec + quality (two-stage chỉ cho diff vùng đắt); loop budget tối đa 2 vòng; fix theo review = TIẾP PHIÊN implementer cũ, không respawn; reviewer KHÔNG chạy lại gate — đọc ledger `verify.md`; **song song nhiều implementer ĐƯỢC PHÉP theo luật fan-out bộ luật §0** (mỗi agent một worktree riêng + scope không giao nhau + tối đa 3) — xem mục "Parallel fan-out" bên dưới. Khi mâu thuẫn với phần dưới, bộ luật §0 thắng.
+> **[Bản vendor đã điều chỉnh theo bộ luật §12 — KHÁC bản plugin]**: review theo RỦI RO thay vì sau mỗi task; MỘT lượt review gộp spec + quality (two-stage chỉ cho diff vùng đắt); loop budget tối đa 2 vòng; fix theo review = TIẾP PHIÊN implementer cũ, không respawn; reviewer KHÔNG chạy lại gate — đọc ledger `verify.md`; **song song nhiều implementer ĐƯỢC PHÉP theo luật fan-out bộ luật §11** (mỗi agent một worktree riêng + scope không giao nhau + tối đa 3) — xem mục "Parallel fan-out" bên dưới. Khi mâu thuẫn với phần dưới, bộ luật §0 thắng.
 
-Execute plan by dispatching fresh subagent per task. Review theo tiêu chí rủi ro của bộ luật §0 (vùng đắt / contract / public API / >5 file / dependency mới) — task không chạm tiêu chí thì main tự đọc diff, không spawn reviewer.
+Execute plan by dispatching fresh subagent per task. Review theo tiêu chí rủi ro của bộ luật §12 (vùng đắt / contract / public API / >5 file / dependency mới) — task không chạm tiêu chí thì main tự đọc diff, không spawn reviewer.
 
 **Why subagents:** You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
 
@@ -88,7 +88,7 @@ digraph process {
 }
 ```
 
-## Parallel fan-out (bản vendor — theo bộ luật §0 "Fan-out song song")
+## Parallel fan-out (bản vendor — theo bộ luật §11 "Fan-out song song")
 
 Bản gốc cấm dispatch nhiều implementer song song vì conflict trong CÙNG working tree. Bản vendor NỚI CÓ ĐIỀU KIỆN — song song an toàn khi và chỉ khi đủ CẢ 4:
 
@@ -250,14 +250,14 @@ Done!
 
 **Never:**
 - Start implementation on main/master branch without explicit user consent
-- Skip review khi diff chạm tiêu chí rủi ro bộ luật §0 (vùng đắt/contract/public API/>5 file/dep mới)
+- Skip review khi diff chạm tiêu chí rủi ro bộ luật §12 (vùng đắt/contract/public API/>5 file/dep mới)
 - Proceed with unfixed issues
 - Dispatch multiple implementation subagents in parallel **trong cùng working tree** (conflicts) — song song CHỈ theo luật fan-out (mục "Parallel fan-out": worktree riêng + scope không giao nhau + ≤ 3 agents)
 - Make subagent read plan file (provide full text instead)
 - Skip scene-setting context (subagent needs to understand where task fits)
 - Ignore subagent questions (answer before letting them proceed)
 - Accept "close enough" on spec compliance (reviewer found issues = not done)
-- Skip re-review khi đã có issues (trong budget 2 vòng — bộ luật §0)
+- Skip re-review khi đã có issues (trong budget 2 vòng — bộ luật §12)
 - Let implementer self-review replace actual review (khi diff thuộc diện phải review)
 - Move to next task while review has open issues
 
@@ -268,7 +268,7 @@ Done!
 
 **If reviewer finds issues:**
 - Implementer (same subagent — SendMessage tiếp phiên, KHÔNG respawn) fixes them
-- Reviewer reviews again — **tối đa 2 vòng/task**; vòng 3 ⇒ DỪNG, trình user quyết (bộ luật §0)
+- Reviewer reviews again — **tối đa 2 vòng/task**; vòng 3 ⇒ DỪNG, trình user quyết (bộ luật §12)
 - Đừng bỏ re-review khi đã có issues, nhưng cũng đừng lặp quá budget
 
 **If subagent fails task:**

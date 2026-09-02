@@ -175,7 +175,7 @@ npm test path/to/test.test.ts
 
 Confirm:
 - Test passes
-- Other tests still pass — **[điều chỉnh theo CLAUDE.md §0 "Verify & Review"]**: trong loop red-green chỉ cần test TARGETED của module đang sửa pass; "toàn bộ suite còn xanh" xác nhận MỘT lần ở gate cuối task (ghi ledger), không chạy full suite mỗi vòng green.
+- Other tests still pass — **[điều chỉnh theo bộ luật §12]**: trong loop red-green chỉ cần test TARGETED của module đang sửa pass; "toàn bộ suite còn xanh" xác nhận MỘT lần ở gate cuối task (ghi ledger), không chạy full suite mỗi vòng green.
 - Output pristine (no errors, warnings)
 
 **Test fails?** Fix code, not test.

@@ -16,7 +16,7 @@ export const KNOWN_MODES = ['quality', 'balance', 'usage'];
 /**
  * Sàn model cho review. MỘT nguồn sự thật, nhưng HAI câu hỏi khác nhau — gộp làm một tập là nới sàn:
  *  - `invariants.reviewFloorModel` = CHÍNH CÁI SÀN ⇒ chỉ `opus`. `inherit` KHÔNG phải một sàn.
- *  - `modelRouting.code-reviewer`  = giá trị routing hợp lệ ⇒ `opus` hoặc `inherit`, vì CLAUDE.md §0
+ *  - `modelRouting.code-reviewer`  = giá trị routing hợp lệ ⇒ `opus` hoặc `inherit`, vì bộ luật §11
  *    cho `inherit` để NÂNG lên model phiên chính, "không bao giờ để hạ".
  * Gộp hai thứ này (bản trước) làm `reviewFloorModel: "inherit"` lọt cổng và khối bơm vào mọi phiên
  * in "sàn inherit review" — đúng lớp lỗi B-2 (câu bơm vào context nói khác cưỡng chế) ở trục khác.

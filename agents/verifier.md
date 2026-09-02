@@ -9,7 +9,7 @@ Bạn là verifier của dự án (xem PROJECT.md) — chạy lệnh kiểm ch�
 
 ## Tra cứu & bằng chứng
 
-Theo bảng quyết định CLAUDE.md §7. Vai bạn là chạy lệnh verify: output làm bằng chứng ⇒ **`rtk proxy <lệnh>`/binary tuyệt đối, KHÔNG tin bản rút gọn**; graph chỉ khi cần khoanh vùng file lỗi.
+Theo bảng quyết định bộ luật §7. Vai bạn là chạy lệnh verify: output làm bằng chứng ⇒ **`rtk proxy <lệnh>`/binary tuyệt đối, KHÔNG tin bản rút gọn**; graph chỉ khi cần khoanh vùng file lỗi.
 
 ## Bộ lệnh chuẩn (chạy theo thứ tự, không dừng giữa chừng khi fail — chạy hết để có bức tranh đủ)
 
@@ -41,7 +41,7 @@ Bằng chứng: <trích nguyên văn phần output quan trọng — dòng lỗi,
 
 ## Ledger (BẮT BUỘC sau khi chạy xong bộ lệnh)
 
-Ghi kết quả vào `docs/wip/<task>/verify.md` theo format CLAUDE.md §0 "Verify & Review": dòng `HEAD:` (`git rev-parse HEAD`), dòng `DIRTY:` (công thức content-hash trong CLAUDE.md §0 — KHÔNG dùng `git status --porcelain`), từng lệnh + exit code, trích output tóm tắt. Ledger này là nguồn bằng chứng để code-reviewer/main **không phải chạy lại gate** — thiếu ledger coi như chưa verify.
+Ghi kết quả bằng `cc-harness gate --out docs/wip/<task>/verify.md` — MÁY chụp `HEAD:`/`DIRTY:` và ghi từng lệnh + exit code. KHÔNG gõ tay hai dòng mốc: gõ tay vừa chép sai số, vừa dễ chụp SAI THỨ TỰ (chụp trước khi cây ngừng đổi) làm sổ tự vỡ ở vai sau. Sổ này là nguồn bằng chứng để code-reviewer/main **không phải chạy lại gate** — thiếu sổ coi như chưa verify. Khuôn đầy đủ: bộ luật §10.
 
 ⚠️ Chụp `HEAD`/`DIRTY` là **bước CUỐI**, ngay sau khi gate chạy xong và KHÔNG còn edit nào sau đó (changelog phải ghi trước, hoặc ledger chốt lại sau changelog). Chụp sớm ⇒ ledger tự vỡ (LEDGER-STALE).
 

@@ -8,7 +8,7 @@ Bạn là debugger của dự án RN mini-app (Module Federation v2, sử dụng
 
 ## Tra cứu & bằng chứng
 
-Theo bảng quyết định CLAUDE.md §7: graph để khoanh vùng (`trace_path`/`detect_changes`/`search_graph` — inherit tool, gọi thẳng), KHÔNG dùng graph làm bằng chứng; bằng chứng & root cause phải đến từ code + test thật (đã `Read`/chạy); output làm bằng chứng ⇒ `rtk proxy`/lệnh thô.
+Theo bảng quyết định bộ luật §7: graph để khoanh vùng (`trace_path`/`detect_changes`/`search_graph` — inherit tool, gọi thẳng), KHÔNG dùng graph làm bằng chứng; bằng chứng & root cause phải đến từ code + test thật (đã `Read`/chạy); output làm bằng chứng ⇒ `rtk proxy`/lệnh thô.
 
 ## Quy trình (theo skill systematic-debugging — đọc `.claude/skills/systematic-debugging/SKILL.md` trước)
 
@@ -21,7 +21,7 @@ Theo bảng quyết định CLAUDE.md §7: graph để khoanh vùng (`trace_path
 ## Điểm hay gặp ở dự án này
 
 - MF runtime warn / duplicate copy ⇒ kiểm tra version trong `rspack.config.mjs::shared` có bị đổi lệch khỏi contract (KHÔNG tự đổi version — NEEDS_ADVICE).
-- Lỗi font/text bị cắt ⇒ xem quy tắc TextInput chống crop descender (CLAUDE.md §6).
+- Lỗi font/text bị cắt ⇒ xem quy tắc TextInput chống crop descender (bộ luật §6).
 - Env undefined ⇒ biến phải khai báo qua rspack DefinePlugin, đọc bằng `process.env.X` literal.
 - Gặp cc-lock **DENY** trong lúc điều tra/sửa ⇒ invoke skill `cc-lock:cc-lock-coordination`. Đây là va chạm điều phối, KHÔNG phải bug của tool — đừng đào tool.
 

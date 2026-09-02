@@ -91,7 +91,7 @@ tautology.
 | **Bất biến QUAN HỆ** (A ≠ B, A ≤ B) | **Giá trị tuyệt đối** chép từ token |
 
 Cột phải là ranh giới **cứng, về nguyên lý** — không phải "khó" mà là "không có dữ liệu để trả lời".
-Với chúng, luật là **chuyển sang bằng chứng mắt** (CLAUDE.md §0 "Quan sát"), **không** cố diễn đạt
+Với chúng, luật là **chuyển sang bằng chứng mắt** (bộ luật §12 "Quan sát"), **không** cố diễn đạt
 bằng assert.
 
 ---

@@ -21,7 +21,7 @@ NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE
 
 If you haven't run the verification command in this message, you cannot claim it passes.
 
-> **[Điều chỉnh theo CLAUDE.md §0 "Verify & Review" — chống chạy lặp]**: "fresh evidence" bao gồm **ledger `docs/wip/<task>/verify.md` còn khớp** — đối chiếu bằng `git rev-parse HEAD` + `git status --porcelain | shasum`. Khớp ⇒ trích ledger làm bằng chứng, KHÔNG chạy lại gate; lệch ⇒ phải chạy lại + ghi ledger mới. Cấm mỗi vai tự chạy lại một bộ gate đã có bằng chứng hợp lệ.
+> **[Điều chỉnh theo bộ luật §12 — chống chạy lặp]**: "fresh evidence" bao gồm **ledger `docs/wip/<task>/verify.md` còn khớp** — đối chiếu bằng `cc-harness stamp docs/wip/<task>/verify.md` (KHÔNG dùng `git status --porcelain | shasum` — nó chỉ hash DANH SÁCH đường dẫn nên mù nội dung, sửa file mà không đổi tên file thì nó vẫn báo khớp). Khớp ⇒ trích ledger làm bằng chứng, KHÔNG chạy lại gate; lệch ⇒ phải chạy lại + ghi ledger mới. Cấm mỗi vai tự chạy lại một bộ gate đã có bằng chứng hợp lệ.
 
 ## The Gate Function
 

@@ -2,7 +2,7 @@
 # SessionStart + PostToolUse (Edit|Write|MultiEdit|NotebookEdit) — lên lịch
 # re-index codebase-memory-mcp ở NỀN (cbm-autosync tự debounce + lock, full mode,
 # không bao giờ chặn caller). Mục đích: graph luôn tươi để mọi agent tin và dùng
-# bậc TÌM của bảng quyết định CLAUDE.md §7 thay vì grep cả repo.
+# bậc TÌM của bảng quyết định bộ luật §7 thay vì grep cả repo.
 # Máy chưa cài cbm-autosync ⇒ thoát im lặng (exit 0, không output).
 #
 # `set -u` cho đồng bộ với mọi hook khác: mọi biến ở dưới đều đã có mặc định `${x:-…}` nên nó

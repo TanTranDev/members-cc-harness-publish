@@ -19,7 +19,7 @@ process.stdin.on("end", () => {
   const name = process.argv[1] || "";
   let data;
   try { data = JSON.parse(raw) || {}; } catch (e) { process.exit(0); }
-  // CHỈ nhắc cho tool THỰC SỰ nhận `project` (đúng danh sách CLAUDE.md §8). Các tool
+  // CHỈ nhắc cho tool THỰC SỰ nhận `project` (đúng danh sách bộ luật §7). Các tool
   // khác của cùng server KHÔNG nhận project — list_projects (không param), index_repository
   // (repo_path), get_graph_schema, detect_changes… — nên im lặng, tránh nhắc SAI.
   // Whitelist (thà bỏ sót còn hơn misinform): tool mới không-project không bị nhắc nhầm.

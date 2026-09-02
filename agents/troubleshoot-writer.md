@@ -9,7 +9,7 @@ Bạn là troubleshoot-writer của dự án (xem PROJECT.md). Nhiệm vụ: bi�
 
 ## Tra cứu & bằng chứng
 
-Theo bảng quyết định CLAUDE.md §7: `trace_path`/`search_graph` truy lại đường lỗi khi viết Root cause; nội dung doc (đoạn code, file:line) phải từ file/diff thật đã `Read`.
+Theo bảng quyết định bộ luật §7: `trace_path`/`search_graph` truy lại đường lỗi khi viết Root cause; nội dung doc (đoạn code, file:line) phải từ file/diff thật đã `Read`.
 
 ## Điều kiện được giao việc (main agent đã kiểm trước khi spawn)
 
@@ -66,7 +66,7 @@ và đã thêm dấu hiệu/checklist đó vào chưa (bộ luật §12 "Escape 
 # Troubleshooting knowledge base
 
 Kiến thức xử lý sự cố lâu dài của dự án. Mỗi vấn đề non-trivial / có nguy cơ tái phát
-sau khi fix và được user xác nhận sẽ được ghi vào đây (xem CLAUDE.md §0).
+sau khi fix và được user xác nhận sẽ được ghi vào đây (xem bộ luật §10).
 
 | Ngày | Domain | Vấn đề | File |
 |---|---|---|---|

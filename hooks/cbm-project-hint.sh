@@ -2,7 +2,7 @@
 # SessionStart — NÓI RA khi máy chưa cài `codebase-memory-mcp`.
 #
 # Hook này CHỈ còn một việc: cảnh báo khi thiếu BIN. Phần "luôn truyền tham số `project`" và bảng
-# 7 tên tool đã chuyển vào bộ luật §0 (cổng cứng, mục 1) — bơm cả bảng đó mỗi phiên là nói hai lần
+# `project` là luật §0 (cổng cứng, mục 1), danh sách 7 tên tool ở §7 — bơm cả bảng đó mỗi phiên là nói hai lần
 # cùng một câu trên đúng đường bơm đắt nhất của bộ khung.
 #
 # Vì sao nhánh thiếu BIN phải ỒN: trước 2026-07-29 nó `exit 0` IM LẶNG, và đó là false-negative đắt
