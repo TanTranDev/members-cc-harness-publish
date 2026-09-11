@@ -20,7 +20,13 @@
     "THÊM (v1.1.0): agent-tasks-gate.sh ở HAI chỗ — matcher Edit|Write|MultiEdit (chặn) và",
     "  mcp__agent-tasks__.* (mở khoá). Tên tool tra từ mã nguồn plugin agent-tasks 0.1.12,",
     "  KHÔNG đoán: matcher đoán sai là cổng câm 100%. Vũ trang lại dùng CHUNG",
-    "  cbm-graph-first-rearm.sh (UserPromptSubmit) — cùng khuôn khoá-theo-yêu-cầu."
+    "  cbm-graph-first-rearm.sh (UserPromptSubmit) — cùng khuôn khoá-theo-yêu-cầu.",
+    "",
+    "SỬA (v1.2.2): mọi \"command\" giờ gọi qua `bash \"...\"` thay vì thực thi thẳng đường dẫn. Lý do:",
+    "  thực thi thẳng dựa vào execute bit của tệp .sh, và bit đó KHÔNG được đảm bảo giữ qua",
+    "  git clone/tarball/zip lúc cài plugin — đo được cache mới tinh có .sh ở mode 644, nên mọi hook",
+    "  chết ngay ở phiên đầu với \"Permission denied\". Gọi qua `bash` bỏ qua hoàn toàn execute bit,",
+    "  chỉ cần quyền ĐỌC tệp — không phụ thuộc cách đóng gói/giải nén giữ permission bits thế nào."
   ],
   "hooks": {
     "SessionStart": [
@@ -29,7 +35,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/rules-inject.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/rules-inject.sh\"",
             "async": false
           }
         ]
@@ -39,11 +45,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-autosync-hook.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-autosync-hook.sh\""
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-project-hint.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-project-hint.sh\"",
             "async": false
           }
         ]
@@ -53,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first-rearm.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first-rearm.sh\"",
             "async": false
           }
         ]
@@ -63,7 +69,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/policy-session-start.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/policy-session-start.sh\"",
             "async": false
           }
         ]
@@ -73,7 +79,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/setup-check-session-start.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/setup-check-session-start.sh\"",
             "async": false
           }
         ]
@@ -85,19 +91,19 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/changelog-entry-gate.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/changelog-entry-gate.sh\""
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/component-test-gate.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/component-test-gate.sh\""
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/design-gate.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/design-gate.sh\""
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\""
           }
         ]
       },
@@ -106,12 +112,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first.sh\"",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-augment.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-augment.sh\"",
             "timeout": 5
           }
         ]
@@ -121,12 +127,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first.sh\"",
             "timeout": 10
           },
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-project-guard.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-project-guard.sh\"",
             "timeout": 5
           }
         ]
@@ -136,7 +142,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/config-mode-agent-guard.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/config-mode-agent-guard.sh\"",
             "async": false
           }
         ]
@@ -146,7 +152,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\"",
             "timeout": 5
           }
         ]
@@ -158,7 +164,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-autosync-hook.sh\""
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-autosync-hook.sh\""
           }
         ]
       }
@@ -168,7 +174,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first-rearm.sh\"",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first-rearm.sh\"",
             "async": false
           }
         ]
