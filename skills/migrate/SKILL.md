@@ -1,43 +1,75 @@
 ---
 name: migrate
-description: "Nâng dự án lên bản cc-harness mới hoặc dọn khoá config đã bỏ. Triggers: \"nâng cấp bộ khung\", \"doctor báo khoá đã bỏ\", \"cc-harness đổi gì ở bản mới\"."
+description: "Bước vào một dự án (đã dùng cc-harness hay chưa) và làm nó sẵn sàng: config · PROJECT.md · CLAUDE.md · cc-lock · agent-tasks · cbm, mặc định từ origin. Triggers: \"cài harness cho dự án\", \"vào dự án mới\", \"setup dự án\", \"migrate\", \"nâng cấp bộ khung\", \"doctor báo khoá đã bỏ\"."
 ---
 
-# Nâng bộ khung cho một dự án
+# Vào một dự án — `cc-harness migrate`
 
-Bộ khung **sống trong plugin**, không có bản copy nào trong repo dự án. Nên "nâng cấp" ở đây chỉ có
-hai việc: cập nhật plugin, và sửa những khoá config đã đổi nghĩa.
+**Không có chế độ.** User không biết source đang có gì; lệnh tự nhìn rồi quyết từng việc: tạo · giữ ·
+bổ sung. Mọi mặc định lấy từ `git remote origin`: cc-lock khoá trên chính repo, agent-tasks claim và
+board trên chính repo — đó là cách đã chạy thật và ổn, không cần repo phụ.
 
-Dự án **chưa có** `claude_config.json` ⇒ đây không phải việc của skill này. Dùng agent
-`project-init` (đọc source → phỏng vấn → khai config + `PROJECT.md`).
+**Bạn (main agent) tự làm toàn bộ, KHÔNG spawn subagent để phỏng vấn** — user đang chat với bạn. Agent
+`project-init` chỉ dùng khi user gọi đích danh muốn khai lại sâu.
 
-## Bước 1 — Chẩn đoán bằng máy
+## Bước 1 — Xem trước (máy)
 
 ```bash
-claude plugin install cc-harness@members-cc-harness   # lấy bản mới nhất
-cc-harness doctor                                     # cổng setup: quyền · trust · tích hợp · export
-cc-harness config --check                             # khoá nào lạ, khoá nào đã bỏ
-cc-harness rules --diff                               # override nào còn áp được
-cc-harness rules --index                              # bảng mục hiện tại
+cc-harness migrate            # không ghi gì; in kế hoạch: tạo gì · giữ gì · vì sao
 ```
 
-Ba dấu hiệu cần xử, theo thứ tự:
+Đọc ba dòng đầu (origin · host · nhánh chính) và bảng kế hoạch. Máy đã quyết:
 
-| `doctor`/`config --check` nói | Nghĩa | Làm gì |
-|---|---|---|
-| `⚠ <khoá>: đã BỎ ở v…` | config còn khai một cơ chế không còn tồn tại | theo `config-keys.md` |
-| `✖ section "<§id>" không có trong bộ luật` | override trỏ mục đã dời hoặc đổi tên | theo bảng ánh xạ dưới |
-| `⚠ mục §0 thiếu annotation` | dự án `replace` mục LÕI mà mất dòng `<!-- inject: core -->` | thêm lại dòng đó vào tệp override |
+| Thấy | Nghĩa |
+|---|---|
+| `host=… (github)` ⇒ `agent_tasks = off` | agent-tasks chỉ chạy với GitLab (Issues API). Nói cho user, không hỏi |
+| `host=… (unknown)` ⇒ `agent_tasks = required` | máy **giả định GitLab tự host**. Hỏi user ĐÚNG MỘT câu nếu tên host không gợi GitLab |
+| `origin: (KHÔNG có …)` | cc-lock/agent-tasks không suy được ⇒ hỏi user URL, hoặc `off` |
+| `giữ <tệp>` | tệp có sẵn — không đụng. Muốn làm mới thì user tự xoá rồi chạy lại |
 
-## Bước 2 — Override trỏ mục đã dời
+Trình cho user **≤ 10 dòng**: kế hoạch + điều máy chưa suy được. Chỉ `AskUserQuestion` cho thứ máy không
+tra được (không có origin · host lạ · muốn tắt tích hợp nào).
 
-`rules.overrides` bám theo `§id`. Id đổi ⇒ override nhận `section-not-found`. Lỗi này **nhìn thấy
-được** (`cc-harness rules --diff` in ra, kèm gợi ý id gần nhất), nhưng vẫn phải sửa: override không áp
-nghĩa là luật của dự án không có hiệu lực.
+## Bước 2 — Ghi (máy)
 
-### v1.0.0 → v1.1.0
+```bash
+cc-harness migrate --yes
+```
 
-§0 bị **xé**: nó từng chứa toàn bộ quy trình (62 KB), nay chỉ còn phần LÕI được bơm mỗi phiên.
+Lệnh sinh: `claude_config.json` (integrations theo host) · `PROJECT.md` · ba dòng `.gitignore` · quyền
+`.claude/settings.json` · `CLAUDE.md` (bản ngắn, hoặc **thêm khối** `<!-- cc-harness:begin -->` vào tệp có
+sẵn) · `cc-lock.config.json` (lockRepoUrl = origin SSH, projectKey auto) · `agent-tasks.config.json`
+(boardUrl = origin HTTPS, claimRepoUrl = origin SSH) · `.git/agent-tasks.env` (quyền 600, `GITLAB_TOKEN=`
+trống). Xong nó chạy `doctor`, `cc-lock status`, `tasks-cli verify` và in "Việc của NGƯỜI còn lại".
+
+## Bước 3 — Điền thứ máy không suy được (bạn)
+
+1. **`PROJECT.md`**: đọc source (graph nếu có, rồi Read) và điền mọi mục `(chưa khai)`: stack · lệnh
+   dev/test/build · bản đồ tầng ↔ thư mục · quy ước tên · nợ kiến trúc. Thứ không suy được từ code
+   (ai phụ trách tích hợp, contract với hệ ngoài) ⇒ hỏi user, một câu một lượt.
+2. **`gate.commands`** trong `claude_config.json`: máy chỉ dò được từ manifest; xác nhận với user.
+3. **Token**: nhắc user điền `GITLAB_TOKEN` vào `.git/agent-tasks.env` (hoặc `~/.agent-tasks/.env` dùng
+   chung mọi dự án), rồi `tasks-cli verify` → `labels --apply` → `board --apply`. Bạn KHÔNG đọc, không
+   điền token.
+4. **Commit** các tệp máy đã liệt kê (không có `agent-tasks.env` — nó nằm trong `.git/`).
+
+## Dự án ĐÃ dùng bản cũ — nâng bộ khung
+
+`migrate` giữ nguyên `claude_config.json` có sẵn và chỉ gợi ý. Việc còn lại là khoá đã đổi nghĩa:
+
+```bash
+cc-harness doctor                # quyền · trust · tích hợp · export
+cc-harness config --check        # khoá lạ · khoá đã bỏ (theo config-keys.md)
+cc-harness rules --diff          # override nào còn áp được
+```
+
+| `doctor`/`config --check` nói | Làm gì |
+|---|---|
+| `⚠ <khoá>: đã BỎ ở v…` | theo `config-keys.md` |
+| `✖ section "<§id>" không có trong bộ luật` | override trỏ mục đã dời — bảng ánh xạ dưới |
+| `⚠ mục §0 thiếu annotation` | thêm lại `<!-- inject: core -->` vào tệp override |
+
+### Override trỏ mục đã dời (v1.0.0 → v1.1.0)
 
 | id cũ (§0/…) | id mới |
 |---|---|
@@ -46,34 +78,20 @@ nghĩa là luật của dự án không có hiệu lực.
 | `§0/quy-tac-subagents-agents` · `§0/ban-giao-cho-subagent-nap-tri-thuc-khong` · `§0/fan-out-song-song-nhieu-implementer-chay` | `§11` |
 | `§0/verify-review-chong-lap-bat-buoc-cac-quy` | `§12` |
 | `§0/chong-dam-chan-khi-nhieu-agents-nhieu-se` | `§13` |
-| `§0/quy-tac-bat-buoc` · `§0/buoc-0-chot-hieu-yeu-cau-bat-buoc-truoc` · `§0/phan-loai-task-hai-dau-ra-khong-phai-mot` | **KHÔNG còn** — thay bằng `§0/phan-loai-viec` (hai cổng, ba cấp) |
+| `§0/quy-tac-bat-buoc` · `§0/buoc-0-chot-hieu-yeu-cau-bat-buoc-truoc` · `§0/phan-loai-task-hai-dau-ra-khong-phai-mot` | **KHÔNG còn** — thay bằng `§0/phan-loai-viec` |
 
-Mục MỚI ở v1.1.0: `§0/cong-cung` · `§0/phan-loai-viec` · `§0/luat-output` · `§0/nguon-su-that` (đều
-thuộc LÕI) và `§14` (agent-tasks).
+Tên hình dạng việc đã bỏ: `LÀM THẲNG` → **LÀM LUÔN** · `CHỐT RỒI LÀM` → **CHỐT RỒI GIAO** · `CHIA RỒI LÀM` /
+`CHỐT, CHIA, RỒI LÀM` → **CHIA RỒI BÓC** · `SPIKE` → một bước trong brainstorming.
 
-⚠️ **Năm tên hình dạng việc đã BỎ** — `LÀM THẲNG` · `CHIA RỒI LÀM` · `CHỐT RỒI LÀM` ·
-`CHỐT, CHIA, RỒI LÀM` · `SPIKE`. Tệp override nào của dự án còn nhắc chúng thì đang nói về một hệ
-không còn tồn tại:
+Còn override không map được ⇒ **HỎI user**, đừng gỡ: gỡ một override là gỡ một luật dự án đã cố ý khai.
 
-| Tên cũ | Cấp mới |
-|---|---|
-| `LÀM THẲNG` | **LÀM LUÔN** |
-| `CHỐT RỒI LÀM` | **CHỐT RỒI GIAO** |
-| `CHIA RỒI LÀM` | **CHIA RỒI BÓC** (vào thẳng bước chia, không brainstorming) |
-| `CHỐT, CHIA, RỒI LÀM` | **CHIA RỒI BÓC** (đủ pha) |
-| `SPIKE` | một **bước** trong pha brainstorming của CHIA RỒI BÓC |
-
-## Bước 3 — Xác nhận
+## Xác nhận cuối
 
 ```bash
-cc-harness rules --diff        # 0 lỗi, và override nào cũng phải xuất hiện ở đây
-cc-harness config --check      # 0 lỗi, 0 cảnh báo khoá-đã-bỏ
 cc-harness doctor              # exit 0
+cc-harness rules --diff        # 0 lỗi
+cc-harness config --check      # 0 lỗi
 ```
 
-Còn một override không áp được mà bạn chưa biết map sang đâu ⇒ **HỎI user**, đừng gỡ nó: gỡ một
-override là gỡ một luật mà dự án đã cố ý khai.
-
-## Chi tiết khoá config
-
-`config-keys.md` — khoá nào mới, khoá nào đã bỏ, và bỏ vì sao.
+Báo cho user một bảng: tệp đã tạo/giữ · integrations đã chọn và vì sao · việc còn lại của người (token ·
+PROJECT.md · commit). Không kể quá trình.

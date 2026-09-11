@@ -35,7 +35,7 @@ KHÁC `docs/knowledge/` (chỉ cho sự cố) và `docs/wip/` (nháp, không com
 - Ai ghi: cấp CHỐT RỒI GIAO / CHIA RỒI BÓC ⇒ agent `changelog-writer`; **LÀM LUÔN** mà đáng ghi ⇒ main agent
   TỰ Write fragment 5 dòng (không spawn subagent cho 5 dòng).
 
-## Format 1 entry (6 mục BẮT BUỘC — không mục nào được bỏ; riêng `LÀM LUÔN` xem cuối mục)
+## Format 1 entry khi `agent_tasks: off` (6 mục BẮT BUỘC; `LÀM LUÔN` xem cuối mục; agent-tasks bật ⇒ mục kế tiếp)
 
 ```markdown
 ---
@@ -73,6 +73,32 @@ Không nợ gì thì ghi `—`. Mục phải CÓ MẶT: "không nợ" là một 
 ```
 
 Entry của LÀM LUÔN rút gọn: frontmatter + "Đã đổi gì" 1–2 dòng + "Bằng chứng gate" 2–3 dòng.
+
+## Khi dự án bật agent-tasks (`integrations.agent_tasks` ≠ `off`) — chỉ HAI mục
+
+Item trên GitLab đã giữ `summary` · `qc_steps` · `risk_declared` · `debt` (issue riêng) · gate (qua
+`task_attach_docs`). Fragment không chép lại; nó giữ đúng thứ có giá trị **qua thời gian** để GitLab chết
+thì repo vẫn còn tri thức. Cổng DENY nếu thiếu `item:` trong frontmatter hoặc thiếu mục.
+
+```markdown
+---
+title: <Tiêu đề task ngắn>
+date: YYYY-MM-DD HH:MM
+tier: <cấp việc> + <mức cẩn thận>
+item: "#123"                            # iid của item; user duyệt làm ngoài sổ ⇒ item: ad-hoc
+scope: <capability / module chính>
+commit: <hash>
+---
+
+### Đã đổi gì
+<1–3 dòng hành vi quan sát được đã đổi.>
+
+### Vì sao
+<KẾT LUẬN 2–4 dòng: chốt hướng nào · BỎ hướng nào · đổi lại được gì.>
+```
+
+`LÀM LUÔN` khi agent-tasks bật: frontmatter (có `item`) + "Đã đổi gì". Tri thức bền hơn nữa — bài học,
+troubleshoot — vẫn vào `docs/knowledge/` như thường, không phụ thuộc tracker.
 
 > ⚠️ **Entry này là HANDOFF CHO QC, và là dấu vết DUY NHẤT nằm trong git.** Ba thứ **KHÔNG** viết
 > vào đây: quá trình ĐI TỚI quyết định — phương án đã thăm dò, ngõ cụt (⇒ item của agent-tasks;

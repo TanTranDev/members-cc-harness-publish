@@ -364,7 +364,8 @@ cc-harness structure             # structure health check (ratchet — xem §2)
 cc-harness spec                  # kiểm format spec hành vi (§10 "Spec hành vi")
 cc-harness observe               # bằng chứng quan sát (§12 "Quan sát") — không bao giờ chặn task
 cc-harness changelog             # đọc gộp changelog fragment theo ngày
-cc-harness init                  # sinh claude_config.json bằng phỏng vấn
+cc-harness init                  # sinh claude_config.json + PROJECT.md + quyền (không hỏi)
+cc-harness migrate [--yes]       # MỘT cửa vào khi bước vào dự án: tự nhìn repo, lấy origin làm mặc định cho cc-lock · agent-tasks · CLAUDE.md
 cc-harness export                # sinh bản chạy độc lập vào script/ cho CI (xem cảnh báo dưới)
 ```
 
@@ -677,8 +678,17 @@ Mỗi khi một task **không-nhỏ-lẻ** (feature / bugfix / refactor) hoàn t
 - **KHÔNG áp dụng** cho fix nhỏ lẻ (typo, style đơn lẻ) — không cần changelog.
 - Quy ước file + format: skill `cc-harness:changelog`. Đọc gộp theo ngày: `cc-harness changelog` (script `changelog-view.mjs`).
 
-**SÁU mục bắt buộc** (cổng `changelog-entry-gate` DENY nếu thiếu; `LÀM LUÔN` rút gọn còn 2):
+**Tài liệu local tồn tại để mang tri thức có giá trị QUA THỜI GIAN** — troubleshoot, bài học, vì sao đã
+chọn cách này. Tracker (GitLab) giữ phần vận hành của một việc; repo giữ phần người sau còn cần khi
+tracker đã chết. Hai hệ quả: (1) `docs/knowledge/` (troubleshoot) **luôn** ở local, bất kể tracker; (2)
+fragment changelog **không chép lại** thứ item đã giữ khi agent-tasks bật.
+
+**SÁU mục bắt buộc khi `agent_tasks: off`** (cổng `changelog-entry-gate` DENY nếu thiếu; `LÀM LUÔN` rút gọn còn 2):
 `Đã đổi gì` · **`Vì sao`** · `Cách kiểm chứng` · `Rủi ro cần soi kỹ` · **`Nợ để lại`** · `Bằng chứng gate`.
+
+**HAI mục khi agent-tasks bật** (`agent_tasks` ≠ `off`): `Đã đổi gì` · `Vì sao`, cộng frontmatter
+`item: #<iid>` (hoặc `item: ad-hoc` khi user đã duyệt làm ngoài sổ); `LÀM LUÔN` chỉ còn `Đã đổi gì`. Cách
+kiểm · rủi ro · nợ · gate đã nằm trên item (`qc_steps` · `risk_declared` · `debt` thành issue · `task_attach_docs`).
 
 Hai mục in đậm là mục **fragment có mà diff không bao giờ có**: diff nói code làm gì, không nói vì
 sao không làm cách khác, và không nói chỗ nào cố ý để lại chưa xong. `Vì sao` nhận **kết luận 2–4
@@ -725,7 +735,7 @@ Model đi theo **bảng `modelRouting` trong `policy/defaults.json`** (nguồn s
 | Phỏng vấn user soạn brief khi docs-raw thiếu | `brief-writer` | Sonnet |
 | Viết troubleshoot doc sau khi fix được xác nhận | `troubleshoot-writer` | Sonnet |
 | Ghi changelog dev sau khi task hoàn tất (CHỐT RỒI GIAO / CHIA RỒI BÓC) | `changelog-writer` | Haiku |
-| Khởi tạo bộ khung sau khi port sang dự án mới (chạy 1 lần) | `project-init` | inherit (model phiên hiện tại) |
+| Khai LẠI sâu bộ khung cho dự án (phỏng vấn dài, chỉ khi user gọi đích danh — đường mặc định là `cc-harness migrate` do MAIN làm) | `project-init` | inherit (model phiên hiện tại) |
 
 **Luật phân công cứng — main KHÔNG tự viết code khi Cổng 2 = "không vừa".** Cấp **CHIA RỒI BÓC**: main agent bàn giao `implementer` viết code production — main chỉ điều phối (chốt hiểu, giao việc kèm scope, trả lời `NEEDS_ADVICE`, đọc review, quyết định); giữ context main sạch cho phán đoán, phần gõ nhiều chạy ở context/model phù hợp. **Cổng 2 = "vừa"** (LÀM LUÔN): main làm LUÔN — phí cố định của spawn (soạn bàn giao + re-priming + đọc kết quả) lớn hơn chính task, spawn ở đây là lỗ. Cửa là **Cổng 2**, không phải trục rủi ro: rủi ro cao thì cẩn thận hơn chứ không tự sinh ra lý do phải spawn `implementer` (cổng review là việc KHÁC — rủi ro cao thì PHẢI có `code-reviewer`, xem §12). KHÔNG tính là code production (main tự làm ở mọi cấp): thao tác git cơ học (status/diff/commit/push), docs/changelog/ledger, chỉnh config vài dòng theo chỉ dẫn tường minh của user.
 

@@ -177,7 +177,7 @@ export function eolOnlyDiff(root) {
  */
 export function renderLedger({
   root, results, head, dirty, why, outIgnore, ignoreWhy,
-  gateTouched = null, eolOnly = null, diagWhy = '', headMoved = false,
+  gateTouched = null, eolOnly = null, diagWhy = '', headMoved = false, specTouched = null,
 }) {
   const na = (r) => `KHÔNG XÁC ĐỊNH — ${r}`;
   const w = Math.max(...results.map((r) => r.cmd.length));
@@ -221,8 +221,19 @@ export function renderLedger({
       + ' KHÔNG chạy ở lượt này; nếu thực ra nó không được bỏ qua thì DIRTY ở trên sẽ lệch khi tính lại.');
   }
   lines.push(`root: ${root}  (${SIG} — §0 "Ledger")`);
-  lines.push('KHAI (người viết bổ sung NGAY TRONG tệp này — §0): RISK (khai) 3–5 dòng · SPEC · SPAWN'
-    + ' + đọc-ngoài-read_first · GATE-AT · QUAN SÁT. Diễn giải DÀI (bảng mutation · escape note ·'
-    + ' bài học) ⇒ changelog / knowledge.');
+  // SPEC điền sẵn: máy biết specs/ có đổi hay không, KHÔNG biết hành vi có đổi ⇒ N/A kèm điều kiện.
+  if (Array.isArray(specTouched)) {
+    if (!specTouched.length) {
+      lines.push('SPEC: N/A — (máy điền sẵn) specs/ KHÔNG đổi trong diff. GIỮ nếu task không đổi hành vi quan sát'
+        + ' được; ĐỔI hành vi mà specs/ không đổi ⇒ diff THIẾU spec (§10) — sửa spec rồi chạy gate lại.');
+    } else {
+      const shown = specTouched.slice(0, 5).join(' · ');
+      lines.push(`SPEC: (máy) specs/ có thay đổi: ${shown}${specTouched.length > 5 ? ' · …' : ''} — khai từng dòng`
+        + ' `<capability> ADDED|MODIFIED|REMOVED|RENAMED "<Requirement>"`.');
+    }
+  }
+  lines.push('KHAI (người viết bổ sung NGAY TRONG tệp này — §0): RISK (khai) 3–5 dòng · SPEC (xác nhận/sửa dòng'
+    + ' máy điền ở trên) · SPAWN + đọc-ngoài-read_first · GATE-AT · QUAN SÁT. Diễn giải DÀI (bảng mutation ·'
+    + ' escape note · bài học) ⇒ changelog / knowledge.');
   return `${lines.join('\n')}\n`;
 }

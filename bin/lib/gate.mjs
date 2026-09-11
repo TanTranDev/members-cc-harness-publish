@@ -160,10 +160,17 @@ export function runGate({ root, config, out, run }) {
   // dòng chẩn đoán là thêm chữ chứ không thêm tin.
   if (snapWhy) diagWhy = '';
 
+  // SPEC điền sẵn bằng MÁY (1.4.0): máy chỉ biết `specs/` có đổi trong diff hay không — không biết hành
+  // vi có đổi. Nên nó điền N/A KÈM điều kiện, người xác nhận; không phải một lời khẳng định thay người.
+  let specTouched = null;
+  try {
+    const st = execFileSync('git', ['status', '--porcelain', '--', 'specs/'], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    specTouched = st.split('\n').filter(Boolean).map((l) => l.slice(3).trim());
+  } catch { specTouched = null; }
   fs.mkdirSync(path.dirname(outAbs), { recursive: true });
   fs.writeFileSync(outAbs, renderLedger({
     root, results, head, dirty, why: snapWhy, outIgnore, ignoreWhy,
-    gateTouched, eolOnly, diagWhy, headMoved,
+    gateTouched, eolOnly, diagWhy, headMoved, specTouched,
   }));
   lines.push(`gate: sổ → ${outAbs}`, `  root: ${root}`);
 

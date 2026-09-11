@@ -23,6 +23,7 @@
 #   (b) Cổng CÂM ⇒ entry rác vẫn land, QC nhận tài liệu không dùng được. Chống bằng: thông điệp
 #       gọi ĐÍCH DANH thứ thiếu, cộng lưới mutation ở `.claude/templates/changelog-entry-gate.test.mjs`.
 set -u
+DIR="${CLAUDE_PROJECT_DIR:-$(pwd)}"
 
 input=$(cat)
 
@@ -31,6 +32,9 @@ input=$(cat)
 command -v node >/dev/null 2>&1 || exit 0
 
 printf '%s' "$input" | node -e '
+const fs = require("fs");
+const path = require("path");
+const DIR = process.argv[1] || process.cwd();
 const WRITE = new Set(["Edit", "Write", "MultiEdit"]);
 
 // Sáu mục của handoff QC (skill `changelog`). Khớp theo TIỀN TỐ vì mục đầu có hậu tố
@@ -53,6 +57,20 @@ const SECTIONS = [
 // gate 2–3 dòng"). Bỏ ngoại lệ này thì cổng thành thuế lên đúng cấp việc phổ biến nhất — và cấp đó
 // theo định nghĩa là việc KHÔNG có đánh đổi để chốt.
 const SECTIONS_LITE = ["Đã đổi gì", "Bằng chứng gate"];
+// agent-tasks BẬT (1.4.0, chốt với user 2026-09-12): item trên GitLab đã giữ summary · qc_steps ·
+// risk_declared · debt (issue riêng) · gate (attach_docs) ⇒ fragment KHÔNG chép lại bốn mục đó. Local chỉ
+// giữ thứ có giá trị QUA THỜI GIAN — "Vì sao" (kết luận, không ai suy lại được từ diff) và "Đã đổi gì"
+// — để GitLab chết thì repo vẫn còn tri thức. Frontmatter phải trỏ item: `item: "#<iid>"`, hoặc
+// `item: ad-hoc` khi user đã duyệt làm ngoài sổ (§14 luật 6). Tri thức bền hơn nữa (troubleshoot ·
+// bài học) vẫn ở docs/knowledge/ — §10 giữ BẮT BUỘC, không phụ thuộc tracker.
+const SECTIONS_TASKS = ["Đã đổi gì", "Vì sao"];
+const SECTIONS_TASKS_LITE = ["Đã đổi gì"];
+let tasksOn = false;
+try {
+  const cfg = JSON.parse(fs.readFileSync(path.join(DIR, "claude_config.json"), "utf8"));
+  const lv = String(((cfg || {}).integrations || {}).agent_tasks || "");
+  tasksOn = lv === "required" || lv === "optional";
+} catch { /* không config ⇒ khuôn 6 mục như cũ */ }
 
 const NAME_RE = /^(\d{8})-\d{6}-[^/]+\.md$/;      // YYYYMMDD-HHMMSS-<slug>.md
 const LEGACY_RE = /(?:^|\/)(?:docs\/releases|changelog)\/\d{8}\.md$/;
@@ -145,9 +163,29 @@ process.stdin.on("end", () => {
   // Nhận CẢ HAI tên: `LÀM LUÔN` là tên từ v1.1.0, `LÀM THẲNG` là tên đã nghỉ nhưng còn nằm trong
   // entry viết trước đó. Chỉ nhận tên mới thì entry cũ lặng lẽ tụt xuống khuôn 4 mục — cổng thành
   // thuế đúng lên cấp việc phổ biến nhất, và không ai đọc được vì sao.
-  const required = /LÀM (LUÔN|THẲNG)/.test(tier) ? SECTIONS_LITE : SECTIONS;
+  const lite = /LÀM (LUÔN|THẲNG)/.test(tier);
+  const required = tasksOn ? (lite ? SECTIONS_TASKS_LITE : SECTIONS_TASKS) : (lite ? SECTIONS_LITE : SECTIONS);
+  if (tasksOn) {
+    const item = fm ? fm[1].match(/^item:\s*(.+)$/m) : null;
+    const val = item ? item[1].trim().replace(/^["\x27]|["\x27]$/g, "") : "";
+    if (!/^(#\d+|ad-hoc)\b/.test(val)) {
+      return deny(
+        `Dự án bật agent-tasks ⇒ entry changelog phải trỏ được về task: thêm vào frontmatter \`item: "#<iid>"\` ` +
+        `(hoặc \`item: ad-hoc\` khi user đã duyệt làm ngoài sổ — §14 luật 6).\n` +
+        `Khuôn khi agent-tasks bật: frontmatter (có item) + ### Đã đổi gì + ### Vì sao. Cách kiểm · rủi ro · nợ · ` +
+        `gate đã nằm trên item (qc_steps · risk_declared · debt · attach_docs) — không chép lại.`,
+      );
+    }
+  }
   const missing = required.filter((s) => !headings.some((h) => h.startsWith(s)));
 
+  if (missing.length && tasksOn) {
+    return deny(
+      `Entry changelog (agent-tasks bật) thiếu ${missing.length} mục: ${missing.map((s) => `"${s}"`).join(" · ")}.\n` +
+      `Đủ bộ: ${required.map((s) => `### ${s}`).join(" · ")} — chỉ hai mục, vì phần còn lại (cách kiểm · rủi ro · nợ · gate) ` +
+      `sống trên item GitLab. "Vì sao" là thứ giữ lại cho ba tháng sau: chốt hướng nào · BỎ hướng nào · đổi lại được gì.`,
+    );
+  }
   if (missing.length) {
     // Fence lẻ (mở mà không đóng) nuốt hết phần còn lại ⇒ thông điệp sẽ nói "thiếu N mục" trong khi
     // chúng nằm ngay trước mắt. Markdown đó vốn đã hỏng nên đây không phải DENY oan, nhưng không
@@ -171,5 +209,5 @@ process.stdin.on("end", () => {
   }
   process.exit(0);
 });
-'
+' "$DIR"
 exit 0

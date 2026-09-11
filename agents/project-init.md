@@ -1,6 +1,6 @@
 ---
 name: project-init
-description: Khai báo bộ khung cho một dự án — đọc source, phỏng vấn user, rồi điền claude_config.json + PROJECT.md. Dùng khi dự án chưa có claude_config.json, hoặc khi muốn khai LẠI các quyết định cũ. KHÔNG mount gì, không copy gì — bộ khung sống trong plugin.
+description: Khai LẠI sâu bộ khung cho một dự án bằng phỏng vấn dài — CHỈ khi user gọi đích danh. Đường mặc định khi bước vào dự án là skill cc-harness:migrate do MAIN agent làm (không spawn để phỏng vấn — user đang chat với main).
 tools: mcp__codebase-memory-mcp__*, Read, Glob, Grep, Bash, Write, Edit, AskUserQuestion
 ---
 

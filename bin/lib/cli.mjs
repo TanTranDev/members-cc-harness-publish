@@ -22,6 +22,7 @@ import { exportRunner } from './export.mjs';
 import { resolvePolicy, setMode } from './policy-resolve.mjs';
 import { renderPolicyBlock, KNOWN_MODES } from './policy.mjs';
 import { tasksCommand } from './tasks-gate.mjs';
+import { migrate } from './migrate.mjs';
 
 const USAGE = `cc-harness — bộ khung quy trình dạng plugin
 
@@ -29,6 +30,9 @@ Dùng: cc-harness <lệnh> [tuỳ chọn]
 
 Lệnh:
   init [--dry-run]        sinh claude_config.json + mở quyền chạy cc-harness cho dự án
+  migrate [--yes]         MỘT cửa vào khi bước vào dự án (đã dùng harness hay chưa): tự nhìn repo, lấy
+                          origin làm mặc định cho cc-lock · agent-tasks · CLAUDE.md · PROJECT.md; không
+                          --yes ⇒ chỉ in kế hoạch. GitHub ⇒ agent_tasks off và nói ra.
   doctor                  cổng setup: config · luật · design system · 4 tích hợp ngoài
   rules --index           bảng mục: id · tầng · dùng khi nào (phần KHÔNG bơm sẵn)
   rules <id> [<id>…]      in ĐÚNG mục cần, vd \`rules §2\`, \`rules §3 §6\`, \`rules §0/luat-output\`
@@ -93,6 +97,14 @@ export function main(argv, io = console) {
     const r = init({ root: path.resolve(opts.root || process.cwd()), write: !flags.has('--dry-run') });
     for (const l of r.lines) io.log(l);
     return r.fail ? 1 : 0;
+  }
+
+  // `migrate` cũng KHÔNG leo tìm marker (cùng lý do với `init`), và chỉ ghi khi `--yes`: kế hoạch phải
+  // được người xem trước — nó tạo tệp ở root repo và trong .git/.
+  if (command === 'migrate') {
+    const r = migrate({ root: path.resolve(opts.root || process.cwd()), pluginRoot, write: flags.has('--yes') && !flags.has('--dry-run') });
+    for (const l of r.lines) (r.code === 0 ? io.log : io.error)(l);
+    return r.code;
   }
 
   // `stamp --formula` chỉ in một HẰNG SỐ của bộ khung — nó không nói gì về cây nào cả, nên bắt nó

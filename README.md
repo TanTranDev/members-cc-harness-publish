@@ -77,6 +77,7 @@ Plugin source nhận cả `ref` (branch/tag) và `sha`; **`sha` thắng `ref`** 
 ## Năm phút đầu trong một dự án
 
 ```bash
+cc-harness migrate   # MỘT cửa vào khi bước vào dự án: tự nhìn repo, lấy origin làm mặc định (cc-lock · agent-tasks · CLAUDE.md · PROJECT.md); --yes để ghi
 cc-harness init      # sinh claude_config.json + mở quyền chạy cc-harness cho dự án này
 cc-harness doctor    # kiểm mọi thứ, kể cả trạng thái trust
 ```
