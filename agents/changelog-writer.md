@@ -42,7 +42,8 @@ câu rỗng nghĩa thì trông như đã khai. Hỏi main một dòng: *"đã c�
 ## Quy tắc
 
 - Chỉ tạo file mới trong `docs/releases/entries/`. KHÔNG sửa code, KHÔNG commit (main lo).
-- Tiếng Việt có dấu, súc tích. **KHÔNG bỏ mục nào** — cổng `changelog-entry-gate` DENY nếu thiếu.
+- Tiếng Việt có dấu, súc tích. **KHÔNG bỏ mục nào** — cổng `changelog-entry-gate` DENY nếu thiếu. Sáu mục,
+  đúng thứ tự cổng kiểm: `Đã đổi gì` · `Vì sao` · `Cách kiểm chứng` · `Rủi ro cần soi kỹ` · `Nợ để lại` · `Bằng chứng gate`.
   Không có gì để viết thì viết thẳng lý do (*"Không có rủi ro nào ngoài phạm vi đã nêu"*), hoặc `—`
   cho mục "Nợ để lại". Chính câu đó là thông tin, khác hẳn một placeholder rỗng.
 - Chép từ context thật — không bịa, không thêm nhận định của riêng bạn.

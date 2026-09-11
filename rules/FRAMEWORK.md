@@ -1039,11 +1039,12 @@ MCP server rời thì `mcp__agent-tasks__<tool>`). Mục này gọi tắt bằng
 | **Bốc việc ĐÃ CÓ trong hàng đợi** | `task_claim_next` (item phù hợp tiếp theo) · `task_claim` (item cụ thể theo `iid`) |
 | Giữ claim khỏi hết hạn | `task_heartbeat` |
 | Nhả việc | `task_release` |
-| Báo tiến độ / chặn | `task_report_progress` · `task_block` |
-| Đính brief · spec · ledger · changelog lên item | `task_attach_docs` |
-| Đóng việc | `task_complete` |
+| Báo tiến độ / chặn (item sang **Needs you**) | `task_report_progress` · `task_block` |
+| Đính spec · ledger · handoff (changelog fragment) · API docs lên item — gọi **TRƯỚC** `task_complete`/`task_block` | `task_attach_docs` |
+| **Báo xong phần agent** ⇒ item sang **In review**, nhả claim — server kiểm điều kiện, thiếu gì trả đúng danh sách | `task_complete` |
+| **Đóng issue sau khi NGƯỜI ok** (merge/rebase xong) — item phải ở In review/Ready to merge; **không có ok của người thì KHÔNG gọi** | `task_close` |
 | **Nạp bối cảnh: N ngày qua đổi gì, VÌ SAO, nợ gì** | `tasks_recap` — xem mục dưới |
-| Chẩn đoán / dò năng lực | `tasks_doctor` · `tasks_probe_capabilities` |
+| Chẩn đoán | `tasks_doctor` |
 
 `tasks_ingest` **không còn trên mặt MCP** từ agent-tasks v0.2 (nhập hàng loạt là thao tác khó lùi ⇒
 thuộc terminal: `tasks-cli ingest`, mặc định dry-run).
@@ -1076,24 +1077,36 @@ Van an toàn nhường đường sau 2 lượt deny trong một yêu cầu, như
 sẽ đòi nói ra. Van là để phiên không kẹt, **không phải lối ra thứ tư**. `cc-harness tasks status` in
 state của cổng khi cần chẩn đoán.
 
-### brief đi vào item bằng đường nào
+### brief đi vào item bằng đường nào (agent-tasks ≥ 0.3)
 
-`task_intake` nhận `brief` (**bắt buộc**) — nguyên văn theo cách user nói, dòng đầu làm title — cộng
-`title` · `slug` · `capability` · `shape` · `care` · `hazard` · `role`. Nó ghi brief thành một khối
-có marker riêng trong description, nên cập nhật brief không đụng khối tài liệu.
+`task_intake` bắt buộc **ba** trường: `title` (tên việc **bạn viết sau khi đã hiểu**, ≤ 80 ký tự, động
+từ + đối tượng — không dán câu chat của user) · `acceptance` (danh sách tiêu chí **KIỂM ĐƯỢC**, mỗi dòng
+một điều — đây là thứ QC đối chiếu) · `brief` (nguyên văn lời user, dùng để dò trùng). Tuỳ chọn: `goal` ·
+`scope` · `out_of_scope` · `slug` · `capability` · `shape` · `care` · `hazard` · `role`. Tool đòi **phỏng
+vấn người trước** (skill `agent-tasks:task-new`) — đó chính là vòng CHỐT của §0; brief 7 mục (§10) ánh
+xạ thẳng: mục tiêu → `goal` · phạm vi → `scope`/`out_of_scope` · hành vi mong muốn + tiêu chí hoàn thành
+→ `acceptance`. Item **đã tồn tại** ⇒ đọc `acceptance` của nó làm đầu vào, không tạo item trùng.
 
-`task_complete` **TỪ CHỐI** đóng item `care::chat` có `hazard` rỗng. Đó là cùng một luật với
-`RISK (khai)` ở §12, cưỡng chế bằng máy: khai hazard thuộc lúc PHÂN LOẠI, không phải lúc báo xong.
+`task_complete` **TỪ CHỐI** item mang nhãn **`careful`** (thay `care::chat` từ 0.3) mà `hazard` rỗng. Đó
+là cùng một luật với `RISK (khai)` ở §12, cưỡng chế bằng máy: khai hazard thuộc lúc PHÂN LOẠI, không
+phải lúc báo xong.
 
-### `tradeoff` và `debt` — hai trường của lúc ĐÓNG việc
+### Các trường lúc BÁO XONG — `task_complete`
 
 | Trường | Bắt buộc khi | Nội dung |
 |---|---|---|
-| `tradeoff` | item `care::chat` **hoặc** `review::required` | chốt hướng nào · **BỎ hướng nào** · đổi lại được gì |
-| `debt` | không bao giờ | nợ cố ý để lại · **ở đâu** · trả nợ thì làm gì |
+| `summary` | **luôn** | đã làm gì, 2–6 dòng cho người đọc |
+| `qc_steps` | **luôn**, trừ khi không kiểm tay được | hướng dẫn kiểm TAY cho QC, mỗi bước *"LÀM GÌ → THẤY GÌ"*: màn hình/endpoint/lệnh · dữ liệu mẫu · kết quả kỳ vọng |
+| `qc_not_manual` + `qc_evidence` | thay `qc_steps` khi không kiểm tay được | vì sao không kiểm tay được + bằng chứng máy (test/lệnh đã chạy, kết quả). Cần gate xanh |
+| `risk_declared` | nên có | chỗ chưa chắc · edge case CHƯA test — chính là `RISK (khai)` của ledger (§12) |
+| `spec_delta` | khi đổi hành vi quan sát được | `{capability, op, requirement}` theo `specs/` |
+| `tradeoff` | item `careful` **hoặc** `review::required` | chốt hướng nào · **BỎ hướng nào** · đổi lại được gì |
+| `debt` | không bao giờ | mảng `{title, detail}` — **mỗi khoản thành MỘT ISSUE MỚI** ở Backlog mang nhãn `debt`; `title` đọc như một việc phải làm; không nợ ⇒ bỏ trống |
+| `review_evidence` | item `review::required` | số note của code-reviewer, hoặc xác nhận của người |
+| `gate_waiver` · `mr_url` | tuỳ | vì sao báo xong dù gate đỏ · link MR để người merge ở cột Ready to merge |
 
-Khai `debt` ⇒ item tự mang nhãn `debt` và hiện ở mục *nợ còn mở* của `tasks_recap` cho tới khi đóng.
-`spec_delta` không rỗng ⇒ tự mang `spec-changed`.
+Nợ nay **không** nằm trên item gốc nữa: `task_complete` tạo issue nợ riêng, và `tasks_recap` đếm nợ
+còn mở từ các issue đó.
 
 Không bắt khai `tradeoff` ở mọi item là **có chủ đích**: đòi khai đánh đổi cho một việc không có
 đánh đổi thì agent viết một câu cho đủ thủ tục, và trường này mất giá trị đúng ở chỗ nó đáng nhất.
@@ -1134,19 +1147,32 @@ hai cửa của cấp 3 chính là 4 slug đầu:
 | **CHIA RỒI BÓC** — cửa A (đủ pha) | `chot-chia-roi-lam` |
 | *(không dùng)* | `spike` — prototype vứt đi nay là một BƯỚC trong pha brainstorming của cửa A, không phải một cấp |
 
-`care` ánh xạ trực tiếp trục rủi ro: mức thường ⇒ `thuong`, chạm thứ đắt ⇒ `chat`.
+`care` ánh xạ trực tiếp trục rủi ro: mức thường ⇒ `thuong`, chạm thứ đắt ⇒ `chat` (⇒ item mang nhãn
+`careful`).
 
-⚠️ Từ agent-tasks **v0.2**, `shape`/`role`/`source` vào `agent-meta`, KHÔNG còn là nhãn GitLab — bộ
-nhãn xuống 13 để board đọc được bằng mắt người. Vẫn **truyền y như cũ**: cùng tham số, cùng enum,
-server tự quyết ghi vào đâu. Hai điều đổi với người gọi:
+⚠️ Từ agent-tasks **v0.2**, `shape`/`role`/`source` vào `agent-meta`, KHÔNG còn là nhãn GitLab. Vẫn
+**truyền y như cũ**: cùng tham số, cùng enum, server tự quyết ghi vào đâu. Hai điều đổi với người gọi:
 - Giá trị ngoài enum ⇒ **isError trước khi tạo item** (không còn lặng lẽ thành nhãn rác).
 - `tasks_list`/`task_claim_next` lọc `role`/`shape`/`source` ở **client** trên một trang 100 item, và
   trả `scan.truncated`. `truncated: true` nghĩa là **còn item ngoài phạm vi quét** — không phải
   "hàng đợi chỉ có thế". Đọc nó trước khi kết luận không còn việc.
 
-Nhãn còn lại đều là thứ **người phải xử lý**: `status::*` · `care::chat` · `gate::green|red` ·
-`needs-advice` · `hotzone` · `review::required` · `source-drifted` · `debt` · `spec-changed`.
-VẮNG nhãn cũng là giá trị: không `care::chat` = mức thường; không `gate::*` = gate chưa chạy.
+**Board 5 cột (agent-tasks ≥ 0.3), đọc bằng mắt người** — trạng thái là nhãn `status::*`:
+
+| Cột | Nghĩa | Ai đưa vào |
+|---|---|---|
+| `backlog` | chưa ai nhận | `task_intake` (khi không claim luôn) |
+| `working` | đang có agent làm — khối *"Đang làm"* trên item ghi ai/máy/agent | claim |
+| `needs-you` | **NGƯỜI** phải làm gì đó: trả lời, quyết, gỡ, sửa CI | `task_block` · `task_report_progress` |
+| `in-review` | người QC theo khối *"Cách kiểm"* (`qc_steps`) | `task_complete` |
+| `ready-to-merge` | QC đạt, người merge/rebase (hoặc bảo agent làm rồi `task_close`) | **người** |
+
+Cờ còn lại, đều là thứ người phải để mắt: `careful` (chạm thứ đắt — thay `care::chat`) · `hotzone`
+(không chạy song song — người gắn) · `review::required` (đòi bằng chứng review — người gắn, hoặc agent
+khi quyết định vào luồng review) · `debt` (trên **issue nợ** do `task_complete` tạo) · `source-drifted`.
+Đã **nghỉ**: `care::chat` · `gate::*` (kết quả gate nằm trong khối *"Kết quả"* của item) · `needs-advice`
+(= `status::needs-you`) · `spec-changed` · `care::thuong`. VẮNG nhãn cũng là giá trị: không `careful` =
+mức thường.
 
 ### `parent` và `depends-on` — tracker CHƯA có trường riêng
 
@@ -1188,8 +1214,10 @@ Mỗi lượt mã hoá một kiểu khác là cách quan hệ giữa các task c
    ```
 
    Mỗi lượt mã hoá một kiểu khác là cách quan hệ giữa các task chết âm thầm.
-5. **Trạng thái theo thực tế, cập nhật ở đúng ba mốc:** nhận việc (claim) · chuyển sang review ·
-   đóng. Cập nhật dồn một lần lúc cuối làm board vô dụng đúng lúc cần nhất — khi có người hỏi
+5. **Trạng thái theo thực tế, cập nhật ở đúng các mốc:** nhận việc (claim ⇒ Working) · kẹt hay cần
+   người quyết (`task_block`/`task_report_progress` ⇒ Needs you) · xong phần agent (`task_complete` ⇒
+   In review) · QC đạt ⇒ **người** kéo sang Ready to merge · merge xong ⇒ `task_close` **chỉ khi người
+   đã ok**. Cập nhật dồn một lần lúc cuối làm board vô dụng đúng lúc cần nhất — khi có người hỏi
    *"đang làm gì rồi"*.
 6. **Land code phải trỏ được về task.** Changelog fragment và mô tả commit/PR ghi id task. Không có
    id (đường ad-hoc ở luật 2) ⇒ ghi rõ *"ad-hoc, user duyệt"*.

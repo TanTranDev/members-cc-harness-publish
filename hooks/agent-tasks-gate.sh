@@ -381,9 +381,9 @@ process.stdin.on("end", () => {
       `    task_claim_next { }               # bốc item phù hợp tiếp theo\n` +
       `    task_claim      { work_item_iid } # item cụ thể\n` +
       `  Việc MỚI chưa từng vào hệ thống:\n` +
-      `    task_intake     { brief, shape, care, hazard }\n` +
-      `      brief = 7 mục (§10). shape: lam-thang | chot-roi-lam | chia-roi-lam | chot-chia-roi-lam\n` +
-      `      care  = thuong | chat. care=chat thì hazard BẮT BUỘC (task_complete từ chối nếu rỗng)\n` +
+      `    task_intake     { title, acceptance[], brief, goal?, scope?, care?, hazard? }\n` +
+      `      title = tên việc BẠN viết sau khi hiểu · acceptance = tiêu chí KIỂM ĐƯỢC (QC đối chiếu) · brief = lời user\n` +
+      `      HỎI user trước (skill agent-tasks:task-new). care=chat ⇒ nhãn careful ⇒ hazard BẮT BUỘC\n` +
       `  User ĐÃ nói "làm ad-hoc, không cần task":\n` +
       `    cc-harness tasks adhoc --reason "<lời user>"   # ghi nhận, rồi sửa tiếp\n\n` +
       `Không có task và user CHƯA nói gì ⇒ HỎI user một câu (tạo task, hay ad-hoc) và DỪNG lượt — đừng tự quyết. ` +
