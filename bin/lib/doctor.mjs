@@ -65,6 +65,42 @@ const STATE = { required: '⛔', optional: '·', off: ' ' };
 /**
  * @returns {{lines:string[], fail:boolean}}
  */
+/**
+ * Tên tool thật của agent-tasks (từ `mcpServers` trong plugin.json đã cài) có được matcher nào của
+ * `hooks/hooks.json` (PostToolUse — nhánh MỞ/KHOÁ của cổng) khớp không. Trả về chuỗi mô tả lệch,
+ * hoặc null khi khớp / không kiểm được (không kiểm được thì KHÔNG báo lệch — tránh WARN sai).
+ */
+export function tasksMatcherDrift({ home, pluginRoot }) {
+  let installPath = null;
+  try {
+    const m = JSON.parse(fs.readFileSync(path.join(home, '.claude', 'plugins', 'installed_plugins.json'), 'utf8'));
+    for (const [k, v] of Object.entries(m.plugins || {})) {
+      if (k.split('@')[0] !== 'agent-tasks') continue;
+      const e = Array.isArray(v) ? v[0] : v;
+      installPath = e?.installPath || null;
+    }
+  } catch { return null; }
+  if (!installPath) return null;
+  let servers = [];
+  try {
+    const pj = JSON.parse(fs.readFileSync(path.join(installPath, '.claude-plugin', 'plugin.json'), 'utf8'));
+    servers = Object.keys(pj.mcpServers || {});
+  } catch { return null; }
+  if (!servers.length) return null;
+  let matchers = [];
+  try {
+    const hj = JSON.parse(fs.readFileSync(path.join(pluginRoot, 'hooks', 'hooks.json'), 'utf8'));
+    matchers = (hj.hooks?.PostToolUse || [])
+      .filter((e) => (e.hooks || []).some((h) => String(h.command || '').includes('agent-tasks-gate.sh')))
+      .map((e) => e.matcher).filter(Boolean);
+  } catch { return null; }
+  if (!matchers.length) return 'cổng claim-task KHÔNG có matcher PostToolUse nào trong hooks.json ⇒ claim xong vẫn không mở khoá';
+  const sample = servers.map((srv) => `mcp__plugin_agent-tasks_${srv}__task_claim`);
+  const unmatched = sample.filter((name) => !matchers.some((re) => { try { return new RegExp(re).test(name); } catch { return false; } }));
+  if (!unmatched.length) return null;
+  return `matcher cổng claim-task (${matchers.join(' | ')}) KHÔNG khớp tên tool thật ${unmatched.join(', ')} ⇒ claim xong vẫn bị deny, cổng câm`;
+}
+
 export function doctor({ root, pluginRoot, home = os.homedir(), env = process.env }) {
   const lines = [];
   let fail = false;
@@ -210,13 +246,20 @@ export function doctor({ root, pluginRoot, home = os.homedir(), env = process.en
         ? 'cc-lock.config.json có ở root repo'
         : 'chưa có <repo>/cc-lock.config.json ⇒ cc-lock trơ (chạy /cc-lock:cc-lock-setup)',
     }),
-    agent_tasks: () => ({
-      ok: pluginInstalled('agent-tasks', home),
-      how: 'claude plugin install agent-tasks',
+    agent_tasks: () => {
+      const installed = pluginInstalled('agent-tasks', home);
       // Thiếu plugin KHÔNG làm luật §14 mất hiệu lực: luật "không có task ⇒ HỎI user" vẫn áp, chỉ
       // là không còn tool để claim. Nói ra để agent không hiểu "chưa cài" thành "được bỏ qua".
-      extra: 'luật §14 vẫn áp dù chưa cài: không có task cho việc này ⇒ HỎI user (tạo task, hay ad-hoc), đừng tự quyết',
-    }),
+      let extra = 'luật §14 vẫn áp dù chưa cài: không có task cho việc này ⇒ HỎI user (tạo task, hay ad-hoc), đừng tự quyết';
+      // Lưới cho cặp "tên tool thật ↔ matcher của cổng claim-task". Tool của MCP server đi kèm plugin
+      // tên `mcp__plugin_<plugin>_<server>__<tool>`; matcher viết theo tên server trần KHÔNG khớp
+      // (đã xảy ra v1.1.0–v1.2.3: cổng câm 100% mà trông như đang chạy). Đối soát bằng máy ở đây.
+      if (installed === true && pluginRoot) {
+        const drift = tasksMatcherDrift({ home, pluginRoot });
+        if (drift) extra = `⚠️ ${drift}`;
+      }
+      return { ok: installed, how: 'claude plugin install agent-tasks', extra };
+    },
     cbm: () => {
       // Phải nhận CẢ biến thể có đuôi của Windows, GIỐNG HỆT `hooks/cbm-graph-first.sh` và
       // `hooks/cbm-project-hint.sh`. Ba nơi lệch nhau thì cùng một máy nhận ba câu trả lời khác

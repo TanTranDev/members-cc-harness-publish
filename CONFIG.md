@@ -250,6 +250,17 @@ Ba trạng thái, và chúng thật sự khác nhau:
 - **`off`** — **im lặng TUYỆT ĐỐI**: không DENY, không WARN, không ghi state. Đây là lời hứa của khung
   với dự án không dùng tích hợp đó — nhưng phải do bạn khai, không phải khung tự đoán.
 
+Riêng `agent_tasks`, ba mức nghĩa là:
+
+| Mức | Lượt sửa đầu dưới `src_dir` khi chưa claim | Kết thúc lượt mà đã sửa `src_dir` không có claim |
+|---|---|---|
+| `required` | **DENY** kèm ba lối ra (claim · intake · `cc-harness tasks adhoc` khi user đã duyệt) | `Stop` chặn **một lần**, đòi claim / khai ad-hoc / hỏi user |
+| `optional` | nhắc một lần mỗi yêu cầu, không chặn | im |
+| `off` | im | im |
+
+Cổng mở khi claim **thành công** và giữ tới `task_complete`/`task_release` — không phải mỗi yêu cầu
+mới lại claim lại. Cần `project.src_dir`: không khai thì cổng không biết đâu là code và không chặn gì.
+
 **Config của tích hợp là của plugin đó**, khung không đọc, không mang theo. Ví dụ danh sách khoá tệp
 của cc-lock sống ở `<repo>/cc-lock.config.json`.
 

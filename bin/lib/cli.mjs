@@ -21,6 +21,7 @@ import { runStamp } from './stamp.mjs';
 import { exportRunner } from './export.mjs';
 import { resolvePolicy, setMode } from './policy-resolve.mjs';
 import { renderPolicyBlock, KNOWN_MODES } from './policy.mjs';
+import { tasksCommand } from './tasks-gate.mjs';
 
 const USAGE = `cc-harness — bộ khung quy trình dạng plugin
 
@@ -50,6 +51,9 @@ Lệnh:
   export                  sinh bản chạy độc lập vào script/ cho CI (bản ĐỨNG YÊN)
   policy --check|--render|--mode|--set-mode <m>
                           tham số vận hành 3 tầng (defaults ← dự án ← clone)
+  tasks adhoc --reason "<lời user>"
+                          user ĐÃ duyệt làm ngoài sổ ⇒ mở cổng claim-task cho phiên này (§14 luật 2)
+  tasks status            state của cổng claim-task: phiên nào giữ task nào, deny mấy lượt
 
 Tuỳ chọn chung:
   --root <path>           ROOT repo dự án (mặc định: leo lên tìm ${CONFIG_FILENAME})
@@ -63,7 +67,7 @@ function parseArgs(argv) {
   const positional = [];
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a === '--root' || a === '--plugin-root' || a === '--out' || a === '--set-mode') { opts[a.slice(2)] = argv[++i]; continue; }
+    if (a === '--root' || a === '--plugin-root' || a === '--out' || a === '--set-mode' || a === '--reason') { opts[a.slice(2)] = argv[++i]; continue; }
     if (a.startsWith('--')) { flags.add(a); continue; }
     positional.push(a);
   }
@@ -182,6 +186,12 @@ export function main(argv, io = console) {
     if (flags.has('--render')) { process.stdout.write(renderPolicyBlock(r.policy, r.mode, root)); return 0; }
     io.log(`policy PASS — schema ${r.policy.schema}, mode=${r.mode} (nguồn: ${r.sources.mode}) · root: ${root}`);
     return 0;
+  }
+
+  if (command === 'tasks') {
+    const r = tasksCommand({ root, config: loadConfig(root).config, sub: positional[1], reason: opts.reason });
+    for (const l of r.lines) (r.code === 0 ? io.log : io.error)(l);
+    return r.code;
   }
 
   if (command === 'gate') {

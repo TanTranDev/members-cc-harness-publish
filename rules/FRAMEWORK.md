@@ -1023,7 +1023,9 @@ im lặng.**
 cổng nào chạy — im lặng hợp pháp, vì đã khai.
 
 Skill của plugin `agent-tasks` mang tiền tố `task-`, gọi bằng namespace: `agent-tasks:task-next`.
-Tool MCP mang tiền tố `mcp__agent-tasks__`.
+Tool MCP của server đi kèm plugin mang tên **`mcp__plugin_agent-tasks_agent-tasks__<tool>`** (cài như
+MCP server rời thì `mcp__agent-tasks__<tool>`). Mục này gọi tắt bằng tên tool trần — `task_claim`,
+`task_intake`… — tên đầy đủ có trong danh sách tool của phiên.
 
 ### Tool nào làm gì
 
@@ -1045,6 +1047,31 @@ thuộc terminal: `tasks-cli ingest`, mặc định dry-run).
 
 **Ba tool MỞ KHOÁ cổng claim**: `task_intake` · `task_claim_next` · `task_claim`. Tool đọc
 (`tasks_list`, `task_get`, `tasks_my_claims`) **không** tính là đã claim — xem hàng đợi ≠ giành việc.
+
+### Cổng claim-task — vòng đời, không phải nghi thức
+
+Cổng theo dõi **một vòng đời task**, không phải một yêu cầu của user:
+
+| Mốc | Cổng làm gì |
+|---|---|
+| Lượt `Edit`/`Write` đầu dưới `project.src_dir` mà phiên chưa giữ claim | `required` ⇒ **DENY** kèm ba lối ra · `optional` ⇒ nhắc một lần, không chặn |
+| Lệnh Bash có vẻ **ghi** vào `src_dir` (`sed -i` · `>` · `tee` · `mv` · `git apply`…) | nhắc, không chặn — heuristic không được quyền deny |
+| `task_intake` / `task_claim_next` / `task_claim` trả **`claimed: true`** | **MỞ** — theo kết quả thật, không theo ý định gọi. Claim thất bại (item đã có phiên khác giữ) ⇒ vẫn đóng |
+| Yêu cầu mới của user trong khi vẫn giữ claim | nhắc đúng một lần *"đang giữ #N — việc này còn thuộc task đó?"* (luật 7), không deny |
+| `task_complete` / `task_release` thành công **đúng task đang giữ** | **KHOÁ LẠI** — lượt sửa code kế tiếp cần claim mới |
+| Kết thúc lượt (`Stop`) mà lượt này đã sửa `src_dir` **không có** claim (`required`) | chặn kết thúc **một lần**, đòi: claim ngay · hoặc khai ad-hoc · hoặc hỏi user. Không được im |
+
+**Ba lối ra của một lượt DENY**, và chỉ ba:
+
+1. Việc đã có trong hàng đợi ⇒ `task_claim_next` / `task_claim`.
+2. Việc mới ⇒ `task_intake` với brief 7 mục (§10).
+3. User **đã nói** *"làm ad-hoc, không cần task"* ⇒ `cc-harness tasks adhoc --reason "<lời user>"`. Lệnh
+   này **từ chối** nếu trong cùng yêu cầu cổng vừa deny — deny rồi lập tức tự khai ad-hoc nghĩa là user
+   chưa có cơ hội trả lời. Đúng thứ tự là: hỏi một câu → dừng lượt → user trả lời → chạy lệnh.
+
+Van an toàn nhường đường sau 2 lượt deny trong một yêu cầu, nhưng lúc đó code land ngoài sổ và `Stop`
+sẽ đòi nói ra. Van là để phiên không kẹt, **không phải lối ra thứ tư**. `cc-harness tasks status` in
+state của cổng khi cần chẩn đoán.
 
 ### brief đi vào item bằng đường nào
 
@@ -1137,8 +1164,9 @@ Mỗi lượt mã hoá một kiểu khác là cách quan hệ giữa các task c
    dưới `project.src_dir`. Chưa claim mà đã sửa là làm việc ngoài sổ: không ai biết ai đang làm gì,
    và hai session dễ nhận cùng một việc.
 2. **Không có task cho việc này ⇒ HỎI, không tự quyết.** Hai đường hợp lệ: (a) tạo task rồi làm,
-   (b) user nói rõ *"làm ad-hoc, không cần task"*. **Ghi lại câu trả lời của user.** Tự chọn (b)
-   trong im lặng là cách lỗ dữ liệu task lớn dần mà không ai thấy.
+   (b) user nói rõ *"làm ad-hoc, không cần task"*. **Ghi lại câu trả lời của user** — bằng
+   `cc-harness tasks adhoc --reason "<lời user>"`, đó cũng là cách duy nhất mở cổng không qua claim.
+   Tự chọn (b) trong im lặng là cách lỗ dữ liệu task lớn dần mà không ai thấy.
 3. **Item là NHÀ của brief.** brief 7 mục (§10) sinh ra ở pha chốt và được ghi vào item — đó là bản
    ghi để người sau và cả team đọc lại, không phải giấy tờ cho vui. Item **đã tồn tại** ⇒ claim rồi
    **đọc brief của nó làm đầu vào**, vòng hỏi chỉ lấp chỗ trống, xong **cập nhật lại item**. Không

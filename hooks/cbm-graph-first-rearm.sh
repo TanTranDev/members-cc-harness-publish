@@ -3,7 +3,7 @@
 #
 # ⚠️ Tên tệp nói "graph-first" vì đó là cổng đầu tiên cần nó, nhưng file này phục vụ **HAI** cổng:
 #   · `cbm-graph-first.sh`     — "graph TRƯỚC, grep SAU"        (state: CC_GRAPH_FIRST_STATE)
-#   · `agent-tasks-gate.sh`    — "claim task TRƯỚC khi sửa code" (state: CC_TASKS_STATE)
+#   · `agent-tasks-gate.sh`    — "claim task TRƯỚC khi sửa code" (state: CC_TASKS_STATE) — CHỈ bộ đếm, xem dưới
 #   · `component-test-gate.sh` — tiêu chí viết test component    (state: CC_COMPONENT_TEST_GATE_STATE)
 # Cả hai khoá theo `session_id` nên cùng vỡ theo một kiểu, và cùng được vá ở đây. Thêm cổng
 # khoá-theo-phiên thứ ba ⇒ thêm một lời gọi `rearm` bên dưới, ĐỪNG tạo hook rearm riêng: mỗi hook
@@ -58,10 +58,17 @@ rearm "${CC_GRAPH_FIRST_STATE:-${TMPDIR:-/tmp}/cc-graph-first}"
 # ⚠️ Tiền tố là BẮT BUỘC, không phải trang trí: `$STATE` dùng chung cho mọi repo trên máy, nên
 # `rm -f *.ok` sẽ vũ trang lại OAN các phiên đang chạy ở repo khác. Phép lọc phải giống hệt phía
 # gate (`String(...).replace(/[^\w.-]/g,"_")`, và `\w` của JS = [A-Za-z0-9_]).
+#
+# ⚠️ v1.3.0: cổng claim-task KHÔNG còn vũ trang lại theo yêu cầu. `.ok` của nó nghĩa là "phiên đang
+# giữ claim", và claim sống theo TASK (tới `task_complete`/`task_release`), không theo yêu cầu của
+# user — xoá `.ok` ở đây là deny lại một phiên đang giữ claim hợp lệ mỗi khi user gõ "tiếp đi", tức
+# dạy model rằng cổng là nhiễu. Ở đây chỉ reset ba tệp MỖI-YÊU-CẦU của nó: `.n` (van) · `.touched`
+# (đầu vào của Stop) · `.seen` (đã nhắc một lần). Cổng tự nhắc "đang giữ #N — còn thuộc task đó?"
+# ở lượt sửa đầu của yêu cầu mới. Đường KHOÁ LẠI duy nhất là PostToolUse của chính cổng.
 TASK_KEY="$(printf '%s' "$DIR" | sed 's#[^A-Za-z0-9._-]#_#g')"
 rearm_tasks() {
   [ -d "$1" ] || return 0
-  rm -f "$1/${TASK_KEY}__"*.ok "$1/${TASK_KEY}__"*.n 2>/dev/null
+  rm -f "$1/${TASK_KEY}__"*.n "$1/${TASK_KEY}__"*.touched "$1/${TASK_KEY}__"*.seen 2>/dev/null
   return 0
 }
 rearm_tasks "${CC_TASKS_STATE:-${TMPDIR:-/tmp}/cc-tasks-gate}"

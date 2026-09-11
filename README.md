@@ -184,6 +184,8 @@ cc-harness gate --out <path>                   # chạy gate.commands tuần t�
 cc-harness changelog [<YYYYMMDD>|--last <N>]   # đọc gộp changelog fragment
 cc-harness observe [--probe|<slug> [-- <lệnh>]]  # bằng chứng quan sát
 cc-harness policy --check|--render|--mode|--set-mode <m>
+cc-harness tasks adhoc --reason "<lời user>"   # user ĐÃ duyệt làm ngoài sổ ⇒ mở cổng claim-task (§14)
+cc-harness tasks status                        # phiên nào giữ task nào · deny mấy lượt
 cc-harness export                              # bản chạy độc lập vào script/ cho CI
 ```
 

@@ -119,7 +119,7 @@
         ]
       },
       {
-        "matcher": "mcp__agent-tasks__.*",
+        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
@@ -138,6 +138,16 @@
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-autosync-hook.sh\""
           }
         ]
+      },
+      {
+        "matcher": "mcp__(plugin_agent-tasks_)?agent-tasks__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\"",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "UserPromptSubmit": [
@@ -147,6 +157,17 @@
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/cbm-graph-first-rearm.sh\"",
             "async": false
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/agent-tasks-gate.sh\"",
+            "timeout": 5
           }
         ]
       }
