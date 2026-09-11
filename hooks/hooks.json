@@ -1,33 +1,4 @@
 {
-  "_ghi_chú": [
-    "Mọi đường dẫn dùng ${CLAUDE_PLUGIN_ROOT} — hook là tài sản của PLUGIN, không phải của repo dự án.",
-    "Khai một hook chưa chạy được thì mỗi phiên nhận một lỗi câm, nên nếu tạm gỡ hook nào ra khỏi đây",
-    "thì phải ghi lý do NGAY TẠI ĐÂY.",
-    "",
-    "ĐÃ GỠ (v1.1.0):",
-    "  superpowers-session-start.sh — bơm NGUYÊN VĂN skills/using-superpowers/SKILL.md (5,4 KB) vào",
-    "  mọi phiên. Ba lý do gỡ: (1) Claude Code đã tự liệt kê skill của plugin nên phần 'cách truy cập",
-    "  skill' là trùng; (2) ba luật còn giá trị đã chuyển vào bộ luật §9 — invoke chủ động, thứ tự ưu",
-    "  tiên khi mâu thuẫn, và namespace; (3) primer đó dạy \"Announce: Using [skill] to [purpose]\",",
-    "  MÂU THUẪN thẳng với §0 Luật output (tên skill là quá trình vận hành, không vào response).",
-    "  Skill vẫn còn và vẫn invoke được — chỉ không auto-bơm nữa.",
-    "",
-    "THÊM (v1.1.0): UserPromptSubmit → cbm-graph-first-rearm.sh. Cổng \"graph trước\" nay vũ trang theo",
-    "  MỘT YÊU CẦU CỦA USER, không theo một phiên: giá để thoát cổng cho cả phiên từng là ĐÚNG MỘT lời",
-    "  gọi search_graph. Nhánh SessionStart(clear|compact) giữ nguyên vì /clear không sinh",
-    "  UserPromptSubmit ngay.",
-    "",
-    "THÊM (v1.1.0): agent-tasks-gate.sh ở HAI chỗ — matcher Edit|Write|MultiEdit (chặn) và",
-    "  mcp__agent-tasks__.* (mở khoá). Tên tool tra từ mã nguồn plugin agent-tasks 0.1.12,",
-    "  KHÔNG đoán: matcher đoán sai là cổng câm 100%. Vũ trang lại dùng CHUNG",
-    "  cbm-graph-first-rearm.sh (UserPromptSubmit) — cùng khuôn khoá-theo-yêu-cầu.",
-    "",
-    "SỬA (v1.2.2): mọi \"command\" giờ gọi qua `bash \"...\"` thay vì thực thi thẳng đường dẫn. Lý do:",
-    "  thực thi thẳng dựa vào execute bit của tệp .sh, và bit đó KHÔNG được đảm bảo giữ qua",
-    "  git clone/tarball/zip lúc cài plugin — đo được cache mới tinh có .sh ở mode 644, nên mọi hook",
-    "  chết ngay ở phiên đầu với \"Permission denied\". Gọi qua `bash` bỏ qua hoàn toàn execute bit,",
-    "  chỉ cần quyền ĐỌC tệp — không phụ thuộc cách đóng gói/giải nén giữ permission bits thế nào."
-  ],
   "hooks": {
     "SessionStart": [
       {
