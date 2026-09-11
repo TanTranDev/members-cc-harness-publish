@@ -1,6 +1,6 @@
 ---
 name: migrate
-description: "Dùng khi một dự án cần nâng bộ khung cc-harness lên bản mới, hoặc khi config của dự án còn khai khoá đã bỏ. Trigger: 'nâng cấp bộ khung', 'config này còn dùng được không', 'doctor báo khoá risk đã bỏ', 'cc-harness đổi gì ở bản mới'. Chẩn đoán bằng máy trước, chỉ hỏi người thứ máy không tra được."
+description: "Nâng dự án lên bản cc-harness mới hoặc dọn khoá config đã bỏ. Triggers: \"nâng cấp bộ khung\", \"doctor báo khoá đã bỏ\", \"cc-harness đổi gì ở bản mới\"."
 ---
 
 # Nâng bộ khung cho một dự án

@@ -10,8 +10,13 @@
 import { resolvePolicy } from './policy-resolve.mjs';
 
 const WATCHED = new Set(['implementer', 'planner', 'debugger']);
-/** Model MẠNH, hoặc RỖNG (rỗng = ăn default Opus của frontmatter) ⇒ ứng viên cảnh báo. */
-const isStrong = (m) => m === '' || /opus|fable|inherit/i.test(m);
+/**
+ * Model MẠNH ⇒ ứng viên cảnh báo. Rỗng KHÔNG còn mặc nhiên là mạnh: từ 1.3.1 frontmatter `implementer`
+ * là `sonnet` (mặc định rẻ, Opus phải xin tường minh), còn `planner`/`debugger` vẫn Opus — nên rỗng
+ * chỉ mạnh với hai vai đó.
+ */
+const OPUS_DEFAULT = new Set(['planner', 'debugger']);
+const isStrong = (m, subagent) => (m === '' ? OPUS_DEFAULT.has(subagent) : /opus|fable|inherit/i.test(m));
 
 /**
  * @param {object} payload PreToolUse payload đã parse
@@ -23,7 +28,7 @@ export function checkSpawn(payload, ctx = {}) {
   if (!WATCHED.has(subagent)) return {};
 
   const model = typeof payload?.tool_input?.model === 'string' ? payload.tool_input.model : '';
-  if (!isStrong(model)) return {}; // sonnet/haiku… ⇒ đúng tinh thần usage
+  if (!isStrong(model, subagent)) return {}; // sonnet/haiku… ⇒ đúng tinh thần usage
 
   // Thang máy escalate 2-fail luôn được phép — ngoại lệ có cấu trúc, cố ý phân biệt HOA/thường.
   const prompt = typeof payload?.tool_input?.prompt === 'string' ? payload.tool_input.prompt : '';

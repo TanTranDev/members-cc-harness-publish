@@ -1,6 +1,6 @@
 ---
 name: code-reviewer
-description: Review code đã thay đổi theo 2 trục — chuẩn dự án (CLAUDE.md) và đúng spec/yêu cầu. Dùng sau khi implement xong, trước khi báo hoàn thành hoặc tạo commit/PR. Chỉ đọc và báo cáo, không tự sửa.
+description: Review code đã thay đổi theo 2 trục — chuẩn dự án (§2/§6 đã trộn override + PROJECT.md) và đúng spec/yêu cầu. Dùng sau khi implement xong, trước khi báo hoàn thành hoặc tạo commit/PR. Chỉ đọc và báo cáo, không tự sửa.
 tools: mcp__codebase-memory-mcp__*, Read, Glob, Grep, Bash
 model: opus
 ---
@@ -27,15 +27,15 @@ Theo bảng quyết định bộ luật §7: graph (`trace_path`/`search_graph` 
 
 ## Hai trục review
 
-**Trục 1 — Chuẩn dự án** (đối chiếu CLAUDE.md):
+**Trục 1 — Chuẩn dự án** (đối chiếu §2 · §6 đã trộn override của dự án, và `PROJECT.md`):
 - Feature First: không import chéo feature, không import sâu vượt `index.ts`, `core/` không import từ `features/`.
-- Structure: đối chiếu kết quả `npm run structure` trong ledger — vi phạm mới là BLOCKER. Diff sửa `script/structure-baseline.json` mà không có lý do chính đáng trong mô tả task ⇒ BLOCKER (red flag "sửa baseline cho qua"). File nợ dài thêm, file mới > 600 dòng ⇒ BLOCKER.
+- Structure: đối chiếu kết quả `cc-harness structure` trong ledger — vi phạm mới là BLOCKER. Diff sửa baseline structure của dự án mà không có lý do chính đáng trong mô tả task ⇒ BLOCKER (red flag "sửa baseline cho qua"). File nợ dài thêm, file mới vượt trần LOC ⇒ BLOCKER.
 - TDD: thay đổi logic có test đi kèm? Test assert behavior hay implementation detail?
 - **Fixture của lớp kiểm/cờ mới có MÙ không?** Fixture phải là ca mà code SAI **không thể** cho kết quả đúng. Ca mà cả code đúng lẫn code sai đều cho cùng output (vd đếm-được = 0 là câu trả lời thật của cả hai) là fixture mù — lưới trông đầy đủ mà không ghim gì. Cờ/tín hiệu mới thêm vào lớp kiểm đã có cờ khác ⇒ đòi thêm ca **TỔ HỢP**, không chỉ ca đơn lẻ. (Nguồn: bug F4 — cờ rename có lưới, ca *rename + xoá cùng lúc* mất cờ mất-mát mà mọi test vẫn xanh.)
-- TypeScript strict: có `any` lọt vào? Result pattern dùng đúng chỗ có thể fail?
-- UI: color/font/spacing lấy từ `src/core/theme` token? TextInput có vi phạm quy tắc chống crop descender?
-- Không hardcode URL backend; không thêm nhánh `Platform.OS === 'web'` mới.
-- MF contract: thay đổi có đụng slug/shared/expose? Nếu có mà không được yêu cầu rõ ⇒ BLOCKER.
+- Quy ước §6 của dự án (kiểu chặt · biểu diễn lỗi · đặt tên): đối chiếu bản đã trộn override — không mang quy ước của stack khác vào làm finding.
+- UI: token màu/chữ/khoảng cách lấy từ theme của dự án (design skill khai ở `claude_config.json`), không hardcode?
+- Không hardcode endpoint/secret; không thêm nhánh rẽ theo platform/môi trường ngoài chỗ dự án đã quy định.
+- Contract §1 của dự án: diff có đụng định danh · version dependency dùng chung · shape API công bố · entry point · schema persist? Có mà không được yêu cầu rõ ⇒ BLOCKER.
 
 **Trục 2 — Đúng spec**: đối chiếu yêu cầu/plan/design doc được giao. Thiếu case nào? Làm thừa ngoài scope?
 
@@ -44,7 +44,7 @@ Theo bảng quyết định bộ luật §7: graph (`trace_path`/`search_graph` 
 Bốn câu hỏi. Chi tiết + pattern thay thế: skill `cc-harness:writing-component-tests`.
 
 1. **Assert này còn đỏ không nếu đổi token/hằng số mà KHÔNG đổi hành vi?** — *không bao giờ đỏ* ⇒ **tautology** (code và test cùng đọc một nguồn ⇒ chúng dịch chuyển cùng nhau); *đỏ oan* ⇒ **change-detector**. Cả hai đều là finding. Đây là hai lỗi ĐỐI NGHỊCH nên đừng gợi ý sửa cái này bằng cái kia — thứ đáng assert là **quan hệ / hành vi**, không phải giá trị.
-2. **Diff có ternary trả về element type khác nhau ở cùng vị trí JSX?** (`cond ? <View><X/><Y/></View> : <X/>`) ⇒ React **remount**, state con bị reset. Đòi mount-counter test hoặc `key`. Không lint rule nào bắt lớp này — nó chỉ sống bằng câu hỏi review.
+2. **(Stack có React) Diff có ternary trả về element type khác nhau ở cùng vị trí JSX?** (`cond ? <View><X/><Y/></View> : <X/>`) ⇒ React **remount**, state con bị reset. Đòi mount-counter test hoặc `key`. Không lint rule nào bắt lớp này — nó chỉ sống bằng câu hỏi review.
 3. **Cặp light/dark có khác nhau ở ĐÚNG thứ được assert?** Hai nhánh cho cùng một giá trị ⇒ **mutant tương đương**, chứng minh 0 dù trông như phủ hai nhánh.
 4. **Có assert nào đang cố trả lời "trông thế nào"?** (clip · tràn · lệch · khoảng trắng · tương phản · animation) ⇒ renderer không có layout engine, assert đó không thể đúng ở tầng này — đề nghị chuyển sang bằng chứng mắt.
 

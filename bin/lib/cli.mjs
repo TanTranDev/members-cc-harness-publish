@@ -31,7 +31,7 @@ Lệnh:
   init [--dry-run]        sinh claude_config.json + mở quyền chạy cc-harness cho dự án
   doctor                  cổng setup: config · luật · design system · 4 tích hợp ngoài
   rules --index           bảng mục: id · tầng · dùng khi nào (phần KHÔNG bơm sẵn)
-  rules <id>              in ĐÚNG một mục, vd \`rules §2\` hoặc \`rules §0/luat-output\`
+  rules <id> [<id>…]      in ĐÚNG mục cần, vd \`rules §2\`, \`rules §3 §6\`, \`rules §0/luat-output\`
   rules --show            in bộ luật đã trộn (base + override của dự án)
   rules --diff            in những gì override đã đổi so với base
   rules --list-sections   in bảng section-id để khai vào ${CONFIG_FILENAME}
@@ -281,17 +281,23 @@ export function main(argv, io = console) {
     }
 
     // `rules §2` — id đi ở positional, không phải cờ. Nhận cả `§2` và `2` cho đỡ phải gõ ký tự §.
-    const wanted = positional[1];
-    if (wanted && !wanted.startsWith('--')) {
+    // Nhiều id (`rules §3 §6`) ⇒ in nối tiếp, ngăn bằng `---`: hook nạp-đúng-lúc gọi MỘT lần cho cả
+    // gói thay vì một tiến trình node mỗi mục. Một id sai ⇒ báo và exit 2, KHÔNG in nửa gói im lặng.
+    const wantedIds = positional.slice(1).filter((w) => !w.startsWith('--'));
+    if (wantedIds.length) {
       if (r.text === null) { printDiag(r); return 1; }
-      const id = wanted.startsWith('§') ? wanted : `§${wanted}`;
-      const got = getSection(r.text, id);
-      if (!got.ok) {
-        const hint = nearestId(id, got.ids);
-        io.error(`cc-harness rules: không có mục "${id}"${hint ? ` — ý bạn là "${hint}"?` : ''}\n\nBảng mục: cc-harness rules --index`);
-        return 2;
+      const chunks = [];
+      for (const wanted of wantedIds) {
+        const id = wanted.startsWith('§') ? wanted : `§${wanted}`;
+        const got = getSection(r.text, id);
+        if (!got.ok) {
+          const hint = nearestId(id, got.ids);
+          io.error(`cc-harness rules: không có mục "${id}"${hint ? ` — ý bạn là "${hint}"?` : ''}\n\nBảng mục: cc-harness rules --index`);
+          return 2;
+        }
+        chunks.push(got.text);
       }
-      io.log(got.text);
+      io.log(chunks.join('\n\n---\n\n'));
       printDiag(r);
       return 0;
     }

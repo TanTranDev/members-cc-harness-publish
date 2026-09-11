@@ -1,6 +1,6 @@
 ---
 name: confirm-understanding
-description: Use when a request has ANY unsettled decision that only the user can answer — the clarify loop of cấp CHỐT RỒI GIAO. Multi-round, one question per round, each with 2–4 options and a recommendation. Stops when the 7-field brief is complete. Triggers on any "làm X / fix Y / thêm Z / đổi W" where there is more than one reasonable reading of the desired behaviour.
+description: "Vòng chốt của cấp CHỐT RỒI GIAO: yêu cầu còn quyết định chỉ user trả lời được. Mỗi vòng một câu, 2–4 lựa chọn kèm khuyến nghị; dứt khi brief đủ 7 mục."
 ---
 
 # Vòng hỏi — chốt hiểu bằng nhiều vòng, mỗi vòng một câu

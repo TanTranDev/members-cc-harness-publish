@@ -117,6 +117,17 @@ process.stdin.on("end", () => {
   const okFile = path.join(STATE, `${key}.ok`);
   const nFile = path.join(STATE, `${key}.n`);      // đếm theo MỘT YÊU CẦU — `rearm` xoá
   const tFile = path.join(STATE, `${key}.total`);  // đếm theo CẢ PHIÊN — `rearm` KHÔNG xoá
+  // `.seen` — đã NÓI câu fail-open một lần trong yêu cầu này. Đo 2026-09-11: không có cờ này, nhánh
+  // "chưa sẵn sàng" nói 94 lần trong một phiên (68 lượt Bash/Grep) ≈ 6.200 token thuần nhiễu, và
+  // subagent Explore chạy 50 lượt grep nhận 50 câu y nhau. Nói MỘT lần mỗi yêu cầu là đủ để
+  // "guard không im" — nói mỗi lượt là guard ồn. `rearm` xoá theo yêu cầu, cùng khuôn `.n`.
+  const sFile = path.join(STATE, `${key}.seen`);
+  const saidOnce = () => {
+    if (fs.existsSync(sFile)) return true;
+    mkState();
+    try { fs.writeFileSync(sFile, ""); } catch { /* không ghi được ⇒ nói (thà ồn hơn câm) */ }
+    return false;
+  };
   const mkState = () => { try { fs.mkdirSync(STATE, { recursive: true }); } catch { /* noop */ } };
 
   // ── Nhánh MỞ KHOÁ ────────────────────────────────────────────────────────────
@@ -203,6 +214,7 @@ process.stdin.on("end", () => {
   })();
 
   if (!probeBin.bin) {
+    if (saidOnce()) process.exit(0);
     return pass(
       `⚠️ Cổng "graph TRƯỚC, grep SAU" **KHÔNG áp được trên máy này**: ${probeBin.why}.
 ` +
@@ -216,10 +228,11 @@ process.stdin.on("end", () => {
 
   const st = call(probeBin.bin, "index_status");
   if (!st || st.status !== "ready" || !(st.nodes > 0)) {
+    if (saidOnce()) process.exit(0);
     return pass(
       `ℹ️ codebase-memory chưa sẵn sàng cho "${NAME}" (status=${st?.status ?? "không đọc được"}) ⇒ ` +
-      `KHÔNG chặn grep. Grep cứ dùng bình thường; muốn có bậc TÌM nhanh thì chạy ` +
-      `index_repository cho project này.`,
+      `KHÔNG chặn grep. Bộ khung đã kích index NỀN ở đầu phiên (cbm-autosync-hook); repo vừa mất vài ` +
+      `giây. Vẫn chưa sẵn sau vài phút ⇒ gọi index_repository(repo_path) một lần. (Nói một lần mỗi yêu cầu.)`,
     );
   }
 
@@ -277,8 +290,11 @@ process.stdin.on("end", () => {
       const sync = `${process.env.HOME}/.local/bin/cbm-autosync`;
       if (fs.existsSync(sync)) {
         spawn(sync, ["index", DIR], { detached: true, stdio: "ignore" }).unref();
+      } else {
+        // 1.3.1: không có tiện ích ngoài thì dùng thẳng CLI của binary — cùng đường `cbm-autosync-hook.sh`.
+        spawn(probeBin.bin, ["cli", "index_repository", "--repo-path", DIR], { detached: true, stdio: "ignore" }).unref();
       }
-    } catch { /* autosync là tiện ích, không phải tiền đề */ }
+    } catch { /* re-index là tiện ích, không phải tiền đề */ }
   }
 
   emit({

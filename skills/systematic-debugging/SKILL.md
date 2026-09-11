@@ -285,7 +285,7 @@ These techniques are part of systematic debugging and available in this director
 
 **Related skills:**
 - **test-driven-development** - For creating failing test case (Phase 4, Step 1)
-- **verification-before-completion** - Verify fix worked before claiming success
+- bộ luật §0 cổng cứng 4–5 và §12 - bằng chứng gate trước khi báo xong
 
 ## Real-World Impact
 

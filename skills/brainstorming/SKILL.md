@@ -1,6 +1,6 @@
 ---
 name: brainstorming
-description: "Động cơ THIẾT KẾ của cấp CHIA RỒI BÓC cửa A — dùng khi vừa có quyết định thiết kế chưa chốt VỪA không làm nổi trong một lượt. Sinh 2–3 phương án kèm đánh đổi, cắt YAGNI, soi lưới tách biệt, trình theo mục để user duyệt từng mục, rồi chia thành item. Không dùng cho việc đã rõ hoặc vừa một lượt."
+description: "Động cơ thiết kế của CHIA RỒI BÓC cửa A: vừa có quyết định thiết kế chưa chốt vừa không vừa một lượt. Sinh 2–3 phương án kèm đánh đổi, duyệt từng mục, rồi chia item. Không dùng cho việc đã rõ."
 ---
 
 # Brainstorming — biến ý tưởng thành thiết kế đã chốt

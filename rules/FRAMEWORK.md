@@ -515,9 +515,10 @@ Mỗi lần DENY đều đính **nhãn lạc**: `detect_changes` > 0 ⇒ nêu **
 ## 9. Skill của plugin
 <!-- when: sắp gọi một skill, hoặc gõ tên trần mà không thấy -->
 
-Bộ khung này là **plugin `cc-harness`**, cài một lần per máy. Nó ship sẵn bộ skill
-[superpowers](https://github.com/obra/superpowers) v5.1.0 cùng skill riêng của khung. Thành viên
-mới **không cần cài gì trong repo dự án**: cài plugin → mở Claude Code → xong.
+Bộ khung này là **plugin `cc-harness`**, cài một lần per máy. Nó ship skill riêng của khung cộng một
+phần skill phái sinh từ [superpowers](https://github.com/obra/superpowers) (đã cắt những skill trùng
+với bộ luật — TDD, verify, review đã sống ở §3/§12 và ở agent `code-reviewer`). Thành viên mới
+**không cần cài gì trong repo dự án**: cài plugin → mở Claude Code → xong.
 
 
 ### Ba luật dùng skill
@@ -527,9 +528,9 @@ mới **không cần cài gì trong repo dự án**: cài plugin → mở Claude
 2. **Thứ tự ưu tiên khi mâu thuẫn**: chỉ thị của user (kể cả `CLAUDE.md` của dự án) → bộ luật này →
    nội dung skill → mặc định hệ thống. Skill nói *"luôn TDD"* mà user nói *"lần này khỏi test"* thì
    theo user.
-3. **KHÔNG thông báo mình đang gọi skill nào.** Bản `superpowers:using-superpowers` gốc dạy *"Announce: Using
-   [skill] to [purpose]"* — câu đó **BỊ §0 Luật output ghi đè**: tên skill là quá trình vận hành,
-   không đi vào response. Cứ dùng skill, đừng kể.
+3. **KHÔNG thông báo mình đang gọi skill nào.** Skill gốc của superpowers dạy *"Announce: Using
+   [skill] to [purpose]"* — câu đó **BỊ §0 Luật output ghi đè** (và skill đó không còn được ship): tên
+   skill là quá trình vận hành, không đi vào response. Cứ dùng skill, đừng kể.
 
 ### Gọi bằng tên có namespace
 
@@ -707,21 +708,23 @@ Repo giữ **spec hành vi LOCAL** (gitignore, không bao giờ push) tại `spe
 
 ### Quy tắc subagents (`agents/`)
 
-Repo định nghĩa sẵn 12 subagents — khi spawn agent (Agent tool) **phải dùng đúng agent type theo bảng**, không spawn agent generic cho việc đã có agent chuyên trách:
+Repo định nghĩa sẵn 12 subagents — khi spawn agent (Agent tool) **phải dùng đúng agent type theo bảng**, không spawn agent generic cho việc đã có agent chuyên trách.
 
-| Việc cần làm | Agent | Model |
+Model đi theo **bảng `modelRouting` trong `policy/defaults.json`** (nguồn sự thật; `cc-harness policy --render` in bản đã resolve) — cột dưới là bản chép của mode `quality` để đọc nhanh. Alias `opus/sonnet/haiku` trỏ thế hệ hiện tại của Anthropic: **Opus 5 · Sonnet 5 · Haiku 4.5**. Nguyên tắc chọn: Opus ở chỗ cần **phán đoán** (thiết kế, root cause, second opinion, soi diff rủi ro); Sonnet ở chỗ có **spec để theo** (gõ code theo plan, review theo checklist, viết tài liệu theo khuôn); Haiku ở chỗ **chép lệnh/chép context**.
+
+| Việc cần làm | Agent | Model (mode `quality`) |
 |---|---|---|
-| Thiết kế giải pháp, viết plan | `planner` | Opus 4.8 |
-| Viết code (feature/bugfix/refactor) theo TDD | `implementer` | Opus 4.8 (Sonnet nếu task cơ học — xem Chính sách model; override model lúc spawn) |
-| Điều tra bug, test fail, hành vi lạ | `debugger` | Opus 4.8 |
-| Review diff trước khi báo xong / commit / PR | `code-reviewer` | Opus (diff có dấu hiệu ở §12 ⇒ override **inherit** lúc spawn nếu phiên chính mạnh hơn — sàn Opus) |
-| Review diff theo trục KIẾN TRÚC (đúng tầng · ranh giới public API · có nên tách file · nhất quán) | `structure-reviewer` | Opus 4.8 |
-| Second-opinion cho quyết định khó/quan trọng | `advisor` | Opus 4.8 |
-| Tra cứu codebase (tìm file/symbol/usage) | `explorer` | Sonnet 5 |
-| Chạy typecheck/lint/test, báo cáo bằng chứng | `verifier` | Haiku 4.5 |
-| Phỏng vấn user soạn brief.md khi docs-raw thiếu | `brief-writer` | Opus 4.8 |
-| Viết troubleshoot doc sau khi fix được xác nhận | `troubleshoot-writer` | Opus 4.8 |
-| Ghi changelog dev sau khi task hoàn tất (CHỐT RỒI GIAO / CHIA RỒI BÓC) | `changelog-writer` | Haiku 4.5 |
+| Thiết kế giải pháp, viết plan | `planner` | Opus |
+| Viết code (feature/bugfix/refactor) theo TDD | `implementer` | **Sonnet mặc định** — bước gắn nhãn `SUY LUẬN`, đụng contract, hay ESCALATE sau 2-fail ⇒ override `model: opus` lúc spawn |
+| Điều tra bug, test fail, hành vi lạ | `debugger` | Opus |
+| Review diff trước khi báo xong / commit / PR | `code-reviewer` | Opus (**sàn**, bất biến; `inherit` nếu phiên chính mạnh hơn) |
+| Review diff theo trục KIẾN TRÚC (đúng tầng · ranh giới public API · có nên tách file · nhất quán) | `structure-reviewer` | Sonnet |
+| Second-opinion cho quyết định khó/quan trọng | `advisor` | Opus |
+| Tra cứu codebase (tìm file/symbol/usage) | `explorer` | Sonnet |
+| Chạy gate, báo cáo bằng chứng | `verifier` | Haiku |
+| Phỏng vấn user soạn brief khi docs-raw thiếu | `brief-writer` | Sonnet |
+| Viết troubleshoot doc sau khi fix được xác nhận | `troubleshoot-writer` | Sonnet |
+| Ghi changelog dev sau khi task hoàn tất (CHỐT RỒI GIAO / CHIA RỒI BÓC) | `changelog-writer` | Haiku |
 | Khởi tạo bộ khung sau khi port sang dự án mới (chạy 1 lần) | `project-init` | inherit (model phiên hiện tại) |
 
 **Luật phân công cứng — main KHÔNG tự viết code khi Cổng 2 = "không vừa".** Cấp **CHIA RỒI BÓC**: main agent bàn giao `implementer` viết code production — main chỉ điều phối (chốt hiểu, giao việc kèm scope, trả lời `NEEDS_ADVICE`, đọc review, quyết định); giữ context main sạch cho phán đoán, phần gõ nhiều chạy ở context/model phù hợp. **Cổng 2 = "vừa"** (LÀM LUÔN): main làm LUÔN — phí cố định của spawn (soạn bàn giao + re-priming + đọc kết quả) lớn hơn chính task, spawn ở đây là lỗ. Cửa là **Cổng 2**, không phải trục rủi ro: rủi ro cao thì cẩn thận hơn chứ không tự sinh ra lý do phải spawn `implementer` (cổng review là việc KHÁC — rủi ro cao thì PHẢI có `code-reviewer`, xem §12). KHÔNG tính là code production (main tự làm ở mọi cấp): thao tác git cơ học (status/diff/commit/push), docs/changelog/ledger, chỉnh config vài dòng theo chỉ dẫn tường minh của user.
@@ -738,7 +741,7 @@ Repo định nghĩa sẵn 12 subagents — khi spawn agent (Agent tool) **phải
 - **Review**: diff có **dấu hiệu** ở §12 ⇒ review bằng model mạnh (đọc diff rẻ hơn viết code nhiều lần nhưng bắt đúng loại lỗi đắt nhất). Sàn `opus` cho review là bất biến, KHÔNG tắt được bằng mode. Phân vân ⇒ model mạnh.
 - Phân vân ⇒ model mạnh. Cấm hạ model cho bước đụng logic phức tạp/contract. Mỗi lần đổi model là một lần re-priming — việc LÀM LUÔN thì main làm luôn, đừng sandwich.
 
-**Mode quality/balance/usage — công tắc per-clone cho chính sách model.** Bảng trên là baseline (= mode `quality`, mặc định khi chưa bật gì). Lệnh `/custom-claude-config-mode [quality|balance|usage]` (skill cùng tên) ghi state per-clone `<git-dir>/config-mode-local.json` — mỗi clone/worktree chạy mode riêng. Mode `balance` là nấc giữa và **KHÔNG phải bản sao của `quality`**: model routing giữ y như `quality`, nhưng **ngân sách spawn đã siết bằng `usage`** (số ở `policy/defaults.json`, tinh chỉnh thật chốt ở lô 4). Mode `usage` hạ MẶC ĐỊNH xuống tier rẻ: implementer Sonnet (Opus CHỈ vùng đắt/contract/escalate) · planner Sonnet cho plan lặp-pattern · debugger Sonnet cho bug quen tái hiện được · explorer Haiku · tie-break "phân vân" đổi thành model RẺ trừ vùng đắt/contract. **Bất biến KHÔNG đổi ở mọi mode**: sàn Opus + inherit cho review vùng đắt · cấm hạ model cho contract/logic phức tạp · 3-strikes · ledger · thang máy escalate 2-fail luôn được phép. Cơ chế: hook SessionStart `policy-session-start.sh` bơm khối `⚙️ POLICY` đã resolve ở **MỌI** mode (không còn im lặng ở `quality`); `policy/` là nguồn sự thật của MỌI ngưỡng — số nào còn nằm trong prose (kể cả bảng model trên + bảng DELTA của skill) là **nợ chưa dọn**, lệch với policy thì policy đúng. Guard PreToolUse (**warn-mode giai đoạn 1** — nhắc, không chặn) soi spawn lệch mode, và CHỈ soi ở `usage`. Model phiên MAIN không tự đổi được — skill chỉ nhắc user gõ `/model`. Thiết kế + policy đầy đủ: `docs/design/2026-07-22-config-mode-design.md`.
+**Mode quality/balance/usage — công tắc per-clone cho chính sách model.** Bảng trên là baseline (= mode `quality`, mặc định khi chưa bật gì). Lệnh `/custom-claude-config-mode [quality|balance|usage]` (skill cùng tên) ghi state per-clone `<git-dir>/config-mode-local.json` — mỗi clone/worktree chạy mode riêng. Mode `balance` là nấc giữa và **KHÔNG phải bản sao của `quality`**: model routing giữ y như `quality`, nhưng **ngân sách spawn đã siết bằng `usage`** (số ở `policy/defaults.json`, tinh chỉnh thật chốt ở lô 4). Mode `usage` hạ tiếp: planner Sonnet cho plan lặp-pattern · debugger Sonnet cho bug quen tái hiện được · explorer Haiku · tie-break "phân vân" đổi thành model RẺ trừ vùng đắt/contract. (Từ 1.3.1 implementer là Sonnet ở **mọi** mode — Opus là thứ phải xin tường minh cho bước `SUY LUẬN`/contract/ESCALATE, đúng khuôn sandwich ở trên.) **Bất biến KHÔNG đổi ở mọi mode**: sàn Opus + inherit cho review vùng đắt · cấm hạ model cho contract/logic phức tạp · 3-strikes · ledger · thang máy escalate 2-fail luôn được phép. Cơ chế: hook SessionStart `policy-session-start.sh` bơm khối `⚙️ POLICY` đã resolve ở **MỌI** mode (không còn im lặng ở `quality`); `policy/` là nguồn sự thật của MỌI ngưỡng — số nào còn nằm trong prose (kể cả bảng model trên + bảng DELTA của skill) là **nợ chưa dọn**, lệch với policy thì policy đúng. Guard PreToolUse (**warn-mode giai đoạn 1** — nhắc, không chặn) soi spawn lệch mode, và CHỈ soi ở `usage`. Model phiên MAIN không tự đổi được — skill chỉ nhắc user gõ `/model`. Thiết kế + policy đầy đủ: `docs/design/2026-07-22-config-mode-design.md`.
 
 **Advisor protocol (bắt buộc khi điều phối subagents)**:
 1. Subagent gặp bế tắc / có ≥ 2 hướng không chắc / sắp đụng contract bất biến ⇒ trả về `NEEDS_ADVICE` (format định nghĩa trong từng agent file) thay vì tự đoán.
@@ -873,7 +876,7 @@ Vai đến sau (code-reviewer, main) đối chiếu bằng **`cc-harness stamp <
 bằng ĐÚNG hàm mà gate dùng để ghi sổ, tự phân giải root, rồi báo thẳng KHỚP/LỆCH (exit 0/1) — dẹp
 cùng lúc cả ba bẫy của đường gõ tay (nền tảng · sai thư mục · chép nhầm hash). **Khớp ⇒ trích ledger
 làm bằng chứng, KHÔNG chạy lại gate**; lệch (code đã đổi sau verify) ⇒ gate phải chạy lại + ghi
-ledger mới. Đây là cách thỏa skill `cc-harness:verification-before-completion` mà không đốt lặp.
+ledger mới. Bằng chứng trước lời khẳng định — đó là cổng cứng số 5 (§0), không phải nghi thức, và không đốt lặp.
 
 ⚠️ **Chụp HEAD/DIRTY là bước CUỐI CÙNG** — sau changelog-writer, sau mọi edit của task (kể cả file docs được track). Chụp sớm rồi tree còn đổi ⇒ ledger tự vỡ (LEDGER-STALE) ở vai đến sau. File trong `docs-raw/`/`docs/wip/` đã gitignore nên ghi ledger không làm lệch hash. Công thức DIRTY hash **nội dung** (diff tracked + nội dung file untracked chưa ignore) — KHÔNG dùng `git status --porcelain | shasum` (chỉ hash danh sách đường dẫn, mù nội dung).
 

@@ -1,6 +1,6 @@
 ---
 name: behavior-specs
-description: Dùng khi task đụng hành vi quan sát được (UI/API/CLI/file state) và cần tạo/cập nhật spec hành vi trong specs/<capability>/spec.md, hoặc khi ledger cần khai mục SPEC (ADDED/MODIFIED/REMOVED/RENAMED), hoặc khi spec-check báo lỗi format/guard scenario-loss. Triggers — spec hành vi, behavior spec, sửa specs/, khai SPEC delta, spec-check fail, guard scenario-loss, allow-removals, skip_specs, npm run spec.
+description: "Tạo/cập nhật spec hành vi specs/<capability>/spec.md khi task đổi hành vi quan sát được; khai mục SPEC của ledger; sửa lỗi spec-check/guard scenario-loss. Triggers: spec hành vi, khai SPEC delta, spec-check fail."
 ---
 
 # behavior-specs — spec hành vi sống theo repo

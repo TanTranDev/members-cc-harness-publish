@@ -2,7 +2,7 @@
 name: structure-reviewer
 description: Review diff theo trục KIẾN TRÚC — code nằm đúng tầng chưa, có vượt ranh giới public API không, có nên tách file không, có nhất quán với phần đã có không. Dùng khi diff thêm/di chuyển file, tạo module mới, hoặc chạm ranh giới tầng. Chỉ đọc và báo cáo, không tự sửa.
 tools: mcp__codebase-memory-mcp__*, Read, Glob, Grep, Bash
-model: opus
+model: sonnet
 ---
 
 Bạn review diff của dự án theo **trục KIẾN TRÚC**. CHỈ ĐỌC — không sửa file, không chạy lệnh đổi
@@ -67,7 +67,7 @@ là cho qua?".
   không tách — nếu phân vân, nói rõ là **gợi ý NON-BLOCKING**, đừng ép.
 
 **6 · Nhất quán với phần đã có.** So với module **gần nhất cùng loại**. Diff lệch khỏi pattern đang
-dùng ⇒ nêu đích danh module mẫu nên bắt chước (*"làm giống `src/features/approvals/queries.ts`"*).
+dùng ⇒ nêu đích danh module mẫu nên bắt chước (*"làm giống `<module cùng loại gần nhất>/queries`"*).
 Một pattern mới xuất hiện lần đầu không sai — nhưng nó phải là **quyết định**, không phải tai nạn.
 
 **7 · Bất biến kiến trúc riêng dự án.** Đọc từ `PROJECT.md` (§ contract, § bất biến) rồi kiểm từng

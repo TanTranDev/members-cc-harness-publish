@@ -58,7 +58,24 @@ escape_for_json() {
 if [ "$code" -ne 0 ]; then
   ctx="⛔ SETUP FAIL (cc-harness doctor exit $code) — KHÔNG nhận task nào cho tới khi sửa xong; dán nguyên văn phần dưới cho user.\n\n$(escape_for_json "$out")"
 elif printf '%s' "$out" | grep -q '⚠'; then
-  ctx="⚠️ SETUP WARN (không chặn task — nhắc user khi tiện):\n\n$(escape_for_json "$out")"
+  # Chỉ dán NGUYÊN VĂN khi nội dung ĐỔI so với lần trước (hoặc chưa từng dán). Đo 2026-09-11: khối này
+  # 1,3 KB bơm ở MỌI startup/resume/clear/compact, kể cả khi cảnh báo là vĩnh viễn và cố ý (repo
+  # cc-harness: "chưa có config"). Cảnh báo không đổi ⇒ một dòng đếm + lệnh xem là đủ; agent cần
+  # chi tiết thì gõ `cc-harness doctor`. Dấu vân tay = `cksum` (có ở cả macOS lẫn Git Bash) của output
+  # doctor; state theo dự án trong TMPDIR — không ghi vào repo. Không ghi được state ⇒ dán đầy đủ
+  # (thà lặp còn hơn câm).
+  n_warn=$(printf '%s' "$out" | grep -c '⚠')
+  sig=$(printf '%s' "$out" | cksum | cut -d' ' -f1)
+  sdir="${CC_SETUP_CHECK_STATE:-${TMPDIR:-/tmp}/cc-setup-check}"
+  skey="$(printf '%s' "$proj" | sed 's#[^A-Za-z0-9._-]#_#g')"
+  prev=""
+  [ -f "$sdir/$skey.sig" ] && prev=$(cat "$sdir/$skey.sig" 2>/dev/null)
+  if [ "$prev" = "$sig" ]; then
+    ctx="⚠️ SETUP: doctor có $n_warn cảnh báo, KHÔNG đổi so với phiên trước (không chặn task). Xem chi tiết: \`cc-harness doctor\`."
+  else
+    mkdir -p "$sdir" 2>/dev/null && printf '%s' "$sig" > "$sdir/$skey.sig" 2>/dev/null
+    ctx="⚠️ SETUP WARN (không chặn task — nhắc user khi tiện):\n\n$(escape_for_json "$out")"
+  fi
 else
   exit 0
 fi

@@ -135,12 +135,23 @@
         "toolCalls": 6,
         "tokensK": 30
       }
+    },
+    "structure-reviewer": {
+      "quality": null,
+      "balance": {
+        "toolCalls": 6,
+        "tokensK": 30
+      },
+      "usage": {
+        "toolCalls": 6,
+        "tokensK": 30
+      }
     }
   },
   "modelRouting": {
     "implementer": {
-      "quality": "opus",
-      "balance": "opus",
+      "quality": "sonnet",
+      "balance": "sonnet",
       "usage": "sonnet"
     },
     "planner": {
@@ -174,14 +185,14 @@
       "usage": "opus"
     },
     "brief-writer": {
-      "quality": "opus",
-      "balance": "opus",
-      "usage": "opus"
+      "quality": "sonnet",
+      "balance": "sonnet",
+      "usage": "sonnet"
     },
     "troubleshoot-writer": {
-      "quality": "opus",
-      "balance": "opus",
-      "usage": "opus"
+      "quality": "sonnet",
+      "balance": "sonnet",
+      "usage": "sonnet"
     },
     "changelog-writer": {
       "quality": "haiku",
@@ -192,6 +203,11 @@
       "quality": "inherit",
       "balance": "inherit",
       "usage": "inherit"
+    },
+    "structure-reviewer": {
+      "quality": "sonnet",
+      "balance": "sonnet",
+      "usage": "sonnet"
     }
   }
 }

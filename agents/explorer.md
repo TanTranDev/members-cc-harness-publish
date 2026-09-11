@@ -29,7 +29,7 @@ cho vai khác (bộ luật §11 "Bàn giao cho subagent"). Vì vậy báo cáo P
 - Tìm theo nhiều cách gọi tên (PascalCase/camelCase/kebab-case) trước khi kết luận "không có".
 - Trả về kết quả dạng dữ liệu gọn: đường dẫn `file:line`, trích đoạn ngắn liên quan, KHÔNG dán cả file.
 - Phân biệt rõ: điều tìm thấy (kèm bằng chứng) vs điều suy đoán (ghi rõ là suy đoán).
-- Lưu ý cấu trúc dự án: feature ở `src/features/<kebab-case>/`, public API tại `index.ts` của mỗi feature, shared primitives ở `src/core/`.
+- Cấu trúc dự án lấy từ bản đồ tầng ↔ thư mục trong `PROJECT.md`; không giả định layout của stack nào.
 
 ## Giới hạn
 

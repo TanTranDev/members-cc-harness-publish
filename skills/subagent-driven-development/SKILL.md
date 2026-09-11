@@ -280,11 +280,11 @@ Done!
 **Required workflow skills:**
 - **using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
 - **writing-plans** - Creates the plan this skill executes
-- **requesting-code-review** - Code review template for reviewer subagents
+- agent `cc-harness:code-reviewer` (bộ luật §12) - review theo tiêu chí rủi ro, không template riêng
 - **finishing-a-development-branch** - Complete development after all tasks
 
 **Subagents should use:**
 - **test-driven-development** - Subagents follow TDD for each task
 
 **Alternative workflow:**
-- **executing-plans** - Use for parallel session instead of same-session execution
+- phiên song song: `/handoff` sang phiên mới rồi làm theo item của agent-tasks (bộ luật §11)

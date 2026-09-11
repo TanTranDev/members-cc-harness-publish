@@ -8,7 +8,7 @@ Use this template when dispatching a code quality reviewer subagent.
 
 ```
 Task tool (general-purpose):
-  Use template at requesting-code-review/code-reviewer.md
+  Spawn agent `cc-harness:code-reviewer` với bàn giao theo bộ luật §11 (read_first · interfaces · RISK (khai) · ledger)
 
   DESCRIPTION: [task summary, from implementer's report]
   PLAN_OR_REQUIREMENTS: Task N from [plan-file]

@@ -1,6 +1,6 @@
 ---
 name: writing-component-tests
-description: Dùng khi viết hoặc sửa test cho component UI ở stack mà renderer test KHÔNG chạy layout engine thật (React Native react-test-renderer/RNTL, web + jsdom) — quyết định assert gì, bỏ gì, và dùng pattern nào thay thế. Triggers — viết test cho component, .test.tsx, .spec.tsx, render test, TDD cho UI, test màu light dark, assert token trong test, test vô bổ, test tautology, change-detector test, bug remount, component nháy, state bị reset, mount-counter, test UI có cần không.
+description: "Viết/sửa test component UI khi renderer không có layout engine (RNTL, jsdom): assert gì, bỏ gì, pattern thay thế. Triggers: test component, .test.tsx, test tautology, change-detector, remount/state reset, test UI có cần không."
 ---
 
 # writing-component-tests — assert gì ở tầng không có layout engine

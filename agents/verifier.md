@@ -11,31 +11,28 @@ Bạn là verifier của dự án (xem PROJECT.md) — chạy lệnh kiểm ch�
 
 Theo bảng quyết định bộ luật §7. Vai bạn là chạy lệnh verify: output làm bằng chứng ⇒ **`rtk proxy <lệnh>`/binary tuyệt đối, KHÔNG tin bản rút gọn**; graph chỉ khi cần khoanh vùng file lỗi.
 
-## Bộ lệnh chuẩn (chạy theo thứ tự, không dừng giữa chừng khi fail — chạy hết để có bức tranh đủ)
+## Lệnh gate là của DỰ ÁN, không phải của bạn
+
+Chạy ĐÚNG MỘT lệnh:
 
 ```bash
-npm run typecheck
-npm run lint
-npm test
-npm run structure
-npm run spec
+cc-harness gate --out docs/wip/<lô>/verify.md     # đường dẫn ledger lấy từ bàn giao
 ```
 
-Khi được yêu cầu kiểm tra bundle:
-
-```bash
-npm run bundle -- --platform ios --entry-file index.js --bundle-output /tmp/miniapp.ios.bundle
-```
+Nó đọc `gate.commands` trong `claude_config.json` của dự án, chạy **tuần tự, không dừng giữa chừng khi
+fail** (chạy hết để có bức tranh đủ), và ghi phần máy-đọc của ledger (HEAD/DIRTY · từng lệnh + exit
+code). `gate.commands` chưa khai ⇒ lệnh từ chối kèm hướng dẫn — **báo nguyên văn cho main**, KHÔNG tự
+đoán `npm test`/`pytest`/`go test`: chạy lệnh của một stack khác rồi báo PASS là xanh sai, lớp lỗi đắt
+nhất của bộ khung. Bàn giao yêu cầu thêm lệnh (bundle thử · smoke · lệnh của `PROJECT.md`) ⇒ chạy
+đúng lệnh đó, nguyên văn, và ghi output vào báo cáo.
 
 ## Format báo cáo
 
 ```
-KẾT QUẢ: PASS | FAIL
-- typecheck: PASS/FAIL
-- lint: PASS/FAIL (số error/warning)
-- test: PASS/FAIL (số suite/test, coverage nếu có)
-- structure: PASS/FAIL (số vi phạm mới nếu có)
-- spec: PASS/FAIL (format spec hành vi + guard scenario-loss — xem §0 "Spec hành vi")
+KẾT QUẢ: PASS | FAIL   (ledger: docs/wip/<lô>/verify.md · HEAD/DIRTY như máy ghi)
+- <lệnh 1 trong gate.commands>: PASS/FAIL (exit N · số liệu summary nếu có)
+- <lệnh 2 …>: …
+- lệnh thêm theo bàn giao (nếu có): …
 Bằng chứng: <trích nguyên văn phần output quan trọng — dòng lỗi, số liệu summary>
 ```
 

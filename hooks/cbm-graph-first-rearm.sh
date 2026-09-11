@@ -42,11 +42,12 @@ NAME="$(printf '%s' "$NAME" | sed 's#[^A-Za-z0-9._-]#_#g')"
 
 # Chỉ xoá state CỦA DỰ ÁN NÀY: `$STATE` dùng chung cho mọi repo trên máy, xoá sạch sẽ tái vũ trang
 # oan các phiên đang chạy ở repo khác. Tên tệp là `<NAME>__<sid>.{ok,n}` (xem hook tương ứng).
-# CHỈ xoá `.ok` (mở khoá) và `.n` (bộ đếm mỗi-yêu-cầu). **KHÔNG xoá `.total`** — đó là trần tuyệt
+# CHỈ xoá `.ok` (mở khoá), `.n` (bộ đếm mỗi-yêu-cầu) và `.seen` (đã nói câu fail-open một lần trong
+# yêu cầu này — v1.3.1). **KHÔNG xoá `.total`** — đó là trần tuyệt
 # đối mỗi phiên; reset nó theo từng yêu cầu thì trần biến thành vô nghĩa và phiên bị nhắc mãi.
 rearm() {
   [ -d "$1" ] || return 0
-  rm -f "$1/${NAME}__"*.ok "$1/${NAME}__"*.n 2>/dev/null
+  rm -f "$1/${NAME}__"*.ok "$1/${NAME}__"*.n "$1/${NAME}__"*.seen 2>/dev/null
   return 0
 }
 
@@ -73,4 +74,17 @@ rearm_tasks() {
 }
 rearm_tasks "${CC_TASKS_STATE:-${TMPDIR:-/tmp}/cc-tasks-gate}"
 rearm "${CC_COMPONENT_TEST_GATE_STATE:-${TMPDIR:-/tmp}/cc-component-test-gate}"
+
+# `rules-jit.sh` (nạp luật đúng lúc) khoá theo PHIÊN, không theo yêu cầu: luật không đổi giữa hai yêu
+# cầu, bơm lại là trả tiền hai lần. Chỉ vũ trang lại khi CONTEXT MẤT — SessionStart(clear|compact) —
+# nên phải đọc `hook_event_name` từ payload: hook này còn được gọi ở UserPromptSubmit, và ở đó KHÔNG xoá.
+# Khoá tệp `<DIR-sanitized>__<sid>.<gói>` — phép lọc giống hệt `safe()` trong rules-jit.sh.
+input=$(cat 2>/dev/null || true)
+case "$input" in
+  *'"hook_event_name"'*'"SessionStart"'*)
+    JIT="${CC_RULES_JIT_STATE:-${TMPDIR:-/tmp}/cc-rules-jit}"
+    JIT_KEY="$(printf '%s' "$DIR" | sed 's#[^A-Za-z0-9._-]#_#g')"
+    [ -d "$JIT" ] && rm -f "$JIT/${JIT_KEY}__"*.edit "$JIT/${JIT_KEY}__"*.task 2>/dev/null
+    ;;
+esac
 exit 0

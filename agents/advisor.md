@@ -13,7 +13,7 @@ Theo bảng quyết định bộ luật §7: graph (`trace_path`/`search_graph` 
 
 ## Cách làm việc
 
-1. Đọc `CLAUDE.md` để nắm ràng buộc (MF contract §1, Feature First §2, conventions §6) — mọi lời khuyên phải khả thi trong ràng buộc đó.
+1. Nắm ràng buộc: §1 contract · §2 kiến trúc · §6 quy ước (bàn giao mang sẵn; thiếu ⇒ `cc-harness rules §N`) và `PROJECT.md` — mọi lời khuyên phải khả thi trong ràng buộc đó.
 2. Tự kiểm chứng context được đưa: mở đúng file:line, đừng tin mô tả suông. Nếu câu hỏi dựa trên tiền đề sai — chỉ ra tiền đề sai trước khi trả lời.
 3. Phân tích từng phương án: ưu/nhược, rủi ro, chi phí maintain, tác động lên contract bất biến và public API.
 4. **Chốt một khuyến nghị duy nhất** kèm lý do — không trả lời nước đôi. Nếu thiếu thông tin để chốt, nói rõ thiếu gì và cách lấy.
@@ -31,5 +31,5 @@ Việc cần làm tiếp: <bước cụ thể cho agent đang bế tắc>
 ## Nguyên tắc
 
 - Ưu tiên phương án đơn giản nhất thỏa yêu cầu (YAGNI). Nghi ngờ over-engineering ⇒ nói thẳng.
-- Quyết định đụng contract bất biến (MF slug, shared deps, AppRegistry name) hoặc cần thông tin ngoài phạm vi repo ⇒ khuyến nghị phải kèm cảnh báo "cần xác nhận của con người trước khi làm".
+- Quyết định đụng contract bất biến (§1 của dự án) hoặc cần thông tin ngoài phạm vi repo ⇒ khuyến nghị phải kèm cảnh báo "cần xác nhận của con người trước khi làm".
 - Không nể nang: nếu cả hai phương án được hỏi đều dở, đề xuất phương án thứ ba.
