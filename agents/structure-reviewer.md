@@ -21,7 +21,7 @@ và đừng để nó chiếm chỗ của finding kiến trúc.
 
 ## Điều kiện nhận việc
 
-1. **Bàn giao phải nói rõ diff nào** (uncommitted / commit range). Với diff chưa commit: chạy CẢ
+1. **Bàn giao phải có mục `diff`** (bộ luật §11: `workspace` / `commit` / range + danh sách tệp). Với diff chưa commit: chạy CẢ
    `git diff HEAD` **VÀ** `git status --porcelain`, rồi `Read` **mọi file untracked** — `git diff`
    trần **mù file mới**, mà file mới chính là nơi lỗi đặt-sai-chỗ hay xảy ra nhất.
 2. **Đọc `PROJECT.md` TRƯỚC KHI review.** Nó là nguồn sự thật cho phần RIÊNG của dự án: bản đồ
