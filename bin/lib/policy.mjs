@@ -16,13 +16,24 @@ export const KNOWN_MODES = ['quality', 'balance', 'usage'];
 /**
  * Sàn model cho review. MỘT nguồn sự thật, nhưng HAI câu hỏi khác nhau — gộp làm một tập là nới sàn:
  *  - `invariants.reviewFloorModel` = CHÍNH CÁI SÀN ⇒ chỉ `opus`. `inherit` KHÔNG phải một sàn.
- *  - `modelRouting.code-reviewer`  = giá trị routing hợp lệ ⇒ `opus` hoặc `inherit`, vì bộ luật §11
- *    cho `inherit` để NÂNG lên model phiên chính, "không bao giờ để hạ".
+ *  - `modelRouting.code-reviewer`  = giá trị routing hợp lệ ⇒ `opus` hoặc `inherit`. Trong bảng
+ *    `inherit` = hook KHÔNG đặt gì ⇒ agent chạy model frontmatter của nó (opus), nên không hạ được sàn.
  * Gộp hai thứ này (bản trước) làm `reviewFloorModel: "inherit"` lọt cổng và khối bơm vào mọi phiên
  * in "sàn inherit review" — đúng lớp lỗi B-2 (câu bơm vào context nói khác cưỡng chế) ở trục khác.
  */
 export const REVIEW_FLOOR_MODEL = 'opus';
 export const REVIEW_ROUTING_MODELS = [REVIEW_FLOOR_MODEL, 'inherit'];
+/**
+ * Model GHI ĐƯỢC vào spawn (`updatedInput.model`) — MỘT nguồn sự thật cho hook (`routeSpawn`), cho
+ * `config --check` và `policy --check`. `inherit` không nằm đây: nó nghĩa "không đặt gì".
+ * NGUỒN: enum `model` của tool Agent, ĐÃ ĐO trên Claude Code 2.1.292 — id đầy đủ
+ * (`claude-haiku-4-5-…`) bị TỪ CHỐI (`Invalid option: expected one of sonnet|opus|haiku|fable`) và làm
+ * hỏng cả spawn. Id đầy đủ chỉ dùng được trong frontmatter của agent. Enum nằm NGOÀI repo, không có lưới.
+ */
+const ROUTABLE = /^(opus|sonnet|haiku|fable)$/;
+export const isRoutableModel = (m) => typeof m === 'string' && ROUTABLE.test(m);
+/** Giá trị bảng routing mà hook sẽ BỎ QUA (gõ sai?) — dùng cho WARN, không phải lỗi. */
+export const isKnownRouting = (m) => m === 'inherit' || isRoutableModel(m);
 /** Bất biến dạng SỐ: phải hữu hạn và > 0 (ngưỡng ≤ 0 vô nghĩa: timebox 0' · fan-out 0). */
 const INVARIANT_NUM_KEYS = ['smartZoneK', 'timeboxMin', 'reviewLoopBudget', 'threeStrikes', 'fanoutMax'];
 /** Khoá bị cấm làm cầu prototype-pollution khi deep-merge dữ liệu NGOÀI (project/local JSON). */

@@ -374,24 +374,13 @@ pptx/
 ```
 When: Reference material too large for inline
 
-## The Iron Law (Same as TDD)
+## The Rule (same as TDD)
 
-```
-NO SKILL WITHOUT A FAILING TEST FIRST
-```
-
-This applies to NEW skills AND EDITS to existing skills.
-
-Write skill before testing? Delete it. Start over.
-Edit skill without testing? Same violation.
-
-**No exceptions:**
-- Not for "simple additions"
-- Not for "just adding a section"
-- Not for "documentation updates"
-- Don't keep untested changes as "reference"
-- Don't "adapt" while running tests
-- Delete means delete
+Test a skill before you ship it, for new skills and for edits alike: an untested skill is a guess
+about how an agent will behave, and the agent finds the loophole you did not test for. If a change
+was written before testing, set it aside and re-derive it from the test results rather than adapting
+it. This holds for "simple additions" and "documentation updates" too — those are where untested
+wording slips through.
 
 **REQUIRED BACKGROUND:** The test-driven-development skill explains why this matters. Same principles apply to documentation.
 
@@ -556,11 +545,9 @@ Run same scenarios WITH skill. Agent should now comply.
 
 Agent found new rationalization? Add explicit counter. Re-test until bulletproof.
 
-**Testing methodology:** the companion file that held it (`testing-skills-with-subagents.md`) was
-removed in the v1.1.0 cleanup — recover it with `git show v1.0.0:skills/writing-skills/testing-skills-with-subagents.md`
-if you need the pressure-scenario playbook. The short version: write scenarios that pressure the
-agent (time, sunk cost, authority, exhaustion), run them WITHOUT the skill to confirm the failure is
-real, then WITH it, and close each new rationalization you find.
+**Testing methodology:** write scenarios that pressure the agent (time, sunk cost, authority,
+exhaustion), run them WITHOUT the skill to confirm the failure is real, then WITH it, and close each
+new rationalization you find.
 
 ## Anti-Patterns
 

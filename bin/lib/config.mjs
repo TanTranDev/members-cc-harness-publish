@@ -12,11 +12,13 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
+import { isKnownRouting } from './policy.mjs';
+
 export const CONFIG_FILENAME = 'claude_config.json';
 
 /** 3 trạng thái của một tích hợp ngoài. Harness áp LUẬT; config của tích hợp là việc của plugin đó. */
 export const INTEGRATION_STATES = ['required', 'optional', 'off'];
-export const KNOWN_INTEGRATIONS = ['cc_lock', 'cbm', 'rtk', 'agent_tasks'];
+export const KNOWN_INTEGRATIONS = ['cc_lock', 'cbm', 'rtk', 'ocr', 'agent_tasks'];
 
 export const OVERRIDE_OPS = ['replace', 'append', 'remove'];
 
@@ -107,7 +109,7 @@ const SCHEMA = {
       KNOWN_INTEGRATIONS.map((k) => [k, { type: 'string', enum: INTEGRATION_STATES }]),
     ),
   },
-  policy: { type: 'object', fields: { mode: { type: 'string' } } },
+  policy: { type: 'object', fields: { mode: { type: 'string' }, modelRouting: { type: 'object', items: 'routing' } } },
 };
 
 /** Kiểu thật của một giá trị JSON — mảng tách khỏi object, null tách khỏi object. */
@@ -204,6 +206,20 @@ function checkNode(node, fields, prefix, out) {
     if (spec.type === 'object' && spec.fields) {
       if (typeOf(v) !== 'object') { err(out, 'type', key, `phải là object, đang là ${typeOf(v)}`); continue; }
       checkNode(v, spec.fields, key, out);
+      continue;
+    }
+    if (spec.type === 'object' && spec.items === 'routing') {
+      if (typeOf(v) !== 'object') { err(out, 'type', key, `phải là object, đang là ${typeOf(v)}`); continue; }
+      for (const [role, byMode] of Object.entries(v)) {
+        if (typeOf(byMode) !== 'object') { err(out, 'type', `${key}.${role}`, `phải là object mode→chuỗi, đang là ${typeOf(byMode)}`); continue; }
+        for (const [m, model] of Object.entries(byMode)) {
+          const k = `${key}.${role}.${m}`;
+          if (typeof model !== 'string' || model.trim() === '') err(out, 'type', k, 'phải là chuỗi model không rỗng');
+          else if (!isKnownRouting(model)) {
+            warn(out, 'unknown-model', k, `"${model}" không phải opus|sonnet|haiku|fable|inherit ⇒ hook bỏ qua, vai chạy model frontmatter (id đầy đủ chỉ dùng được trong frontmatter của agent)`);
+          }
+        }
+      }
       continue;
     }
     if (spec.type === 'array' && spec.items === 'override') {

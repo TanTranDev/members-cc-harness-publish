@@ -24,7 +24,7 @@ Lệnh `cc-harness risk` đã bị xoá cùng cơ chế nó phục vụ. Script 
 | `design_system` (`ds-web`, `ds-mobile`) | agent | đường TƯƠNG THÍCH cho hai bề mặt UI |
 | `rules.overrides` | máy | tuỳ biến bộ luật theo mục (`replace`/`append`/`remove`) |
 | `observe` | máy | đích + cách lấy bằng chứng quan sát |
-| `integrations` (`cc_lock`, `cbm`, `rtk`, `agent_tasks`) | máy + agent | `required`/`optional`/`off` |
+| `integrations` (`cc_lock`, `cbm`, `rtk`, `ocr`, `agent_tasks`) | máy + agent | `required`/`optional`/`off` |
 | `policy.mode` | máy | `quality` · `balance` · `usage` |
 
 Khoá lạ ⇒ WARN "gõ sai, hay thừa?". Khoá đã BỎ ⇒ WARN riêng nói nó chết vì sao và thay bằng gì —

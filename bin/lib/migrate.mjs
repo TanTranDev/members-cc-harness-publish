@@ -134,6 +134,7 @@ export function migrate({ root, pluginRoot, write = false, home = os.homedir(), 
     cc_lock: remote ? 'required' : 'off',
     cbm: cbm ? 'required' : 'optional',
     rtk: 'optional',
+    ocr: 'optional',
     agent_tasks: !remote ? 'off' : remote.kind === 'github' ? 'off' : 'required',
   };
   const integWhy = {

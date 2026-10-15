@@ -94,7 +94,7 @@ Hỏi những gì code không tự nói được:
    lệnh dev/build.
 6. **Trần LOC** (`structure.max_loc`) và **shared features** cần whitelist.
 7. **Đích quan sát** (`observe.target`): `in-process` (CLI/lib/backend) · `served` · `deployed`.
-8. **Tích hợp ngoài**: `cc_lock` · `cbm` · `rtk` · `agent_tasks`, mỗi cái `required`/`optional`/`off`.
+8. **Tích hợp ngoài**: `cc_lock` · `cbm` · `rtk` · `ocr` · `agent_tasks`, mỗi cái `required`/`optional`/`off`.
    Khai `off` là hợp pháp và im lặng — nhưng phải do user chọn, không phải bạn tự chọn hộ.
 9. **Skill riêng của stack** (`skills.required`, `skills.hints`) và **design system** nếu có UI.
 10. **Mode policy** (`policy.mode`): `quality` · `balance` · `usage`.

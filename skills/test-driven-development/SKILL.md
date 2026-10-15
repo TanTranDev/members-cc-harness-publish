@@ -28,21 +28,13 @@ Write the test first. Watch it fail. Write minimal code to pass.
 
 Thinking "skip TDD just this once"? Stop. That's rationalization.
 
-## The Iron Law
+## The Rule
 
-```
-NO PRODUCTION CODE WITHOUT A FAILING TEST FIRST
-```
-
-Write code before the test? Delete it. Start over.
-
-**No exceptions:**
-- Don't keep it as "reference"
-- Don't "adapt" it while writing tests
-- Don't look at it
-- Delete means delete
-
-Implement fresh from tests. Period.
+For behavior that can break at runtime, write the failing test first and watch it fail for the right
+reason. A test written after the code passes immediately, so it cannot show that it would catch the
+bug. If code came first, set it aside and implement fresh from the tests instead of adapting it:
+tests shaped by existing code confirm what the code does, not what it should do. What needs a test
+and what does not follows the project rules (§3).
 
 ## Red-Green-Refactor
 

@@ -279,6 +279,12 @@ export function doctor({ root, pluginRoot, home = os.homedir(), env = process.en
       };
     },
     rtk: () => ({ ok: hasTool('rtk'), how: 'cài rtk', extra: null }),
+    // Chỉ `hasTool` (where/which): KHÔNG execFile chạy `ocr` — bài học .cmd/CVE-2024-27980 trên Windows.
+    ocr: () => ({
+      ok: hasTool('ocr'),
+      how: 'npm i -g @alibaba-group/open-code-review (hoặc brew)',
+      extra: 'bước review dùng `ocr delegate preview/rule`, KHÔNG dùng `ocr review`',
+    }),
   };
 
   say(`\ntích hợp:`);

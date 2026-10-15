@@ -285,12 +285,11 @@ Nguyên tắc: **test bảo vệ hành vi có thể gãy lúc RUNTIME; thứ com
 | **Code phân giải đường dẫn/môi trường** (root, cwd, path, biến env) ⇒ test end-to-end **MỌI layout được hỗ trợ**, không chỉ layout mình đang chạy | — |
 | **Thêm một lớp kiểm/gate** ⇒ phải có ca chứng minh nó **FAIL được** (fixture vi phạm hoặc mutation: đảo nhánh ⇒ test phải đỏ) — lớp kiểm có **nhiều nhánh điều kiện** thì mutation phải chạy cho **TỪNG nhánh**, và với điều kiện `AND`/`OR` phải đảo **TỪNG TOÁN HẠNG**, không chỉ cả cụm. Một mutation chỉ được kết luận **"sống"** sau khi **chứng minh nó ĐÃ ÁP** (diff/grep bản mutant — file **untracked** thì `git diff` mù, phải đọc lại từ disk) — mutation no-op trông y hệt lưới thiếu. Mutant **tương đương** (không đổi output quan sát được) KHÔNG tính là lưới thiếu. Thêm **cờ/tín hiệu mới vào một lớp kiểm đã có cờ khác** ⇒ phải test **TỔ HỢP** với cờ sẵn có, không chỉ ca đơn lẻ của cờ mới | — |
 
-> Hai dòng cuối là **luật rút từ bug thật**, không phải khuyến nghị: 4/4 BLOCKER của các task
-> 1.8 · F1+F2 đều là **false-negative im lặng** (gate báo xanh khi thực ra không kiểm gì) và **không
-> cái nào bị test bắt** — vì test luôn chạy ở đường đi "đúng cách". Ba thứ bắt được chúng: chạy thật ở
-> layout khác · mutation test · câu hỏi *"làm sao để nó im lặng mà vẫn xanh?"*. Và 2 lần liên tiếp
-> "logic mới thêm nhanh hơn lưới ghim nó" ⇒ mới có dòng thứ hai. Mệnh đề **TỔ HỢP** thêm sau F5 lô A:
-> F4 thêm cờ `spec-rename` có lưới cho ca đơn lẻ, nhưng ca *rename + xoá scenario cùng lúc* — tổ hợp
+> Hai dòng cuối là **luật rút từ bug thật**, không phải khuyến nghị: cả 4 BLOCKER đã gặp đều là
+> **false-negative im lặng** (gate báo xanh khi thực ra không kiểm gì) và **không cái nào bị test
+> bắt** — vì test luôn chạy ở đường đi "đúng cách". Ba thứ bắt được chúng: chạy thật ở layout khác ·
+> mutation test · câu hỏi *"làm sao để nó im lặng mà vẫn xanh?"*. Mệnh đề **TỔ HỢP** có vì một cờ mới
+> (`spec-rename`) từng có lưới cho ca đơn lẻ, nhưng ca *rename + xoá scenario cùng lúc* — tổ hợp
 > phổ biến nhất — thì **mất cờ mất-mát** mà mọi test vẫn xanh.
 
 Vùng xám (quyết trong 10 giây): **nhánh điều kiện MỚI** ở bất kỳ tầng nào ⇒ một test cho CẢ HAI phía; đổi điều kiện SẴN CÓ đã có test phủ ⇒ sửa test đó, không thêm test mới. Phần "không cần test" thì không có "red" nào để viết — TDD chỉ áp cho phần PHẢI-test.
@@ -529,9 +528,9 @@ với bộ luật — TDD, verify, review đã sống ở §3/§12 và ở agent
 2. **Thứ tự ưu tiên khi mâu thuẫn**: chỉ thị của user (kể cả `CLAUDE.md` của dự án) → bộ luật này →
    nội dung skill → mặc định hệ thống. Skill nói *"luôn TDD"* mà user nói *"lần này khỏi test"* thì
    theo user.
-3. **KHÔNG thông báo mình đang gọi skill nào.** Skill gốc của superpowers dạy *"Announce: Using
-   [skill] to [purpose]"* — câu đó **BỊ §0 Luật output ghi đè** (và skill đó không còn được ship): tên
-   skill là quá trình vận hành, không đi vào response. Cứ dùng skill, đừng kể.
+3. **KHÔNG thông báo mình đang gọi skill nào**, kể cả khi skill dạy *"Announce at start: I'm using
+   [skill] …"* — §0 Luật output thắng: tên skill là quá trình vận hành, không đi vào response. Cứ dùng
+   skill, đừng kể.
 
 ### Gọi bằng tên có namespace
 
@@ -676,7 +675,7 @@ Mỗi khi một task **không-nhỏ-lẻ** (feature / bugfix / refactor) hoàn t
 - Cấp **LÀM LUÔN** mà đủ lớn để đáng ghi: main agent TỰ Write fragment 5 dòng — KHÔNG spawn subagent (spawn để viết 5 dòng là lỗ token). **CHỐT RỒI GIAO / CHIA RỒI BÓC**: spawn `changelog-writer` (truyền: tiêu đề, yêu cầu, quyết định đã chốt, file đụng tới, verify/commit). Prototype vứt đi trong pha brainstorming: **không changelog** — xoá code, không có gì land.
 - Còn bằng chứng quan sát chưa lấy được (§12 "Quan sát") ⇒ entry gắn dấu ⏳ để user quét cuối ngày.
 - **KHÔNG áp dụng** cho fix nhỏ lẻ (typo, style đơn lẻ) — không cần changelog.
-- Quy ước file + format: skill `cc-harness:changelog`. Đọc gộp theo ngày: `cc-harness changelog` (script `changelog-view.mjs`).
+- Quy ước file + format: skill `cc-harness:changelog`. Đọc gộp theo ngày: `cc-harness changelog`.
 
 **Tài liệu local tồn tại để mang tri thức có giá trị QUA THỜI GIAN** — troubleshoot, bài học, vì sao đã
 chọn cách này. Tracker (GitLab) giữ phần vận hành của một việc; repo giữ phần người sau còn cần khi
@@ -718,9 +717,9 @@ Repo giữ **spec hành vi LOCAL** (gitignore, không bao giờ push) tại `spe
 
 ### Quy tắc subagents (`agents/`)
 
-Repo định nghĩa sẵn 12 subagents — khi spawn agent (Agent tool) **phải dùng đúng agent type theo bảng**, không spawn agent generic cho việc đã có agent chuyên trách.
+Repo định nghĩa sẵn 11 subagents — khi spawn agent (Agent tool) **phải dùng đúng agent type theo bảng**, không spawn agent generic cho việc đã có agent chuyên trách.
 
-Model đi theo **bảng `modelRouting` trong `policy/defaults.json`** (nguồn sự thật; `cc-harness policy --render` in bản đã resolve) — cột dưới là bản chép của mode `quality` để đọc nhanh. Alias `opus/sonnet/haiku` trỏ thế hệ hiện tại của Anthropic: **Opus 5 · Sonnet 5 · Haiku 4.5**. Nguyên tắc chọn: Opus ở chỗ cần **phán đoán** (thiết kế, root cause, second opinion, soi diff rủi ro); Sonnet ở chỗ có **spec để theo** (gõ code theo plan, review theo checklist, viết tài liệu theo khuôn); Haiku ở chỗ **chép lệnh/chép context**.
+Model đi theo **bảng `modelRouting` trong `policy/defaults.json`** (nguồn sự thật; `cc-harness policy --render` in bản đã resolve) — cột dưới là bản chép của mode `quality` để đọc nhanh. Alias `opus/sonnet/haiku` trỏ thế hệ hiện hành của từng tầng — do Claude Code quyết, không phải bộ luật. Nguyên tắc chọn: Opus ở chỗ cần **phán đoán** (thiết kế, root cause, second opinion, soi diff rủi ro); Sonnet ở chỗ có **spec để theo** (gõ code theo plan, review theo checklist, viết tài liệu theo khuôn); Haiku ở chỗ **chép lệnh/chép context**.
 
 | Việc cần làm | Agent | Model (mode `quality`) |
 |---|---|---|
@@ -732,7 +731,6 @@ Model đi theo **bảng `modelRouting` trong `policy/defaults.json`** (nguồn s
 | Second-opinion cho quyết định khó/quan trọng | `advisor` | Opus |
 | Tra cứu codebase (tìm file/symbol/usage) | `explorer` | Sonnet |
 | Chạy gate, báo cáo bằng chứng | `verifier` | Haiku |
-| Phỏng vấn user soạn brief khi docs-raw thiếu | `brief-writer` | Sonnet |
 | Viết troubleshoot doc sau khi fix được xác nhận | `troubleshoot-writer` | Sonnet |
 | Ghi changelog dev sau khi task hoàn tất (CHỐT RỒI GIAO / CHIA RỒI BÓC) | `changelog-writer` | Haiku |
 | Khai LẠI sâu bộ khung cho dự án (phỏng vấn dài, chỉ khi user gọi đích danh — đường mặc định là `cc-harness migrate` do MAIN làm) | `project-init` | inherit (model phiên hiện tại) |
@@ -751,7 +749,7 @@ Model đi theo **bảng `modelRouting` trong `policy/defaults.json`** (nguồn s
 - **Review**: diff có **dấu hiệu** ở §12 ⇒ review bằng model mạnh (đọc diff rẻ hơn viết code nhiều lần nhưng bắt đúng loại lỗi đắt nhất). Sàn `opus` cho review là bất biến, KHÔNG tắt được bằng mode. Phân vân ⇒ model mạnh.
 - Phân vân ⇒ model mạnh. Cấm hạ model cho bước đụng logic phức tạp/contract. Mỗi lần đổi model là một lần re-priming — việc LÀM LUÔN thì main làm luôn, đừng sandwich.
 
-**Mode quality/balance/usage — công tắc per-clone cho chính sách model.** Bảng trên là baseline (= mode `quality`, mặc định khi chưa bật gì). Lệnh `/custom-claude-config-mode [quality|balance|usage]` (skill cùng tên) ghi state per-clone `<git-dir>/config-mode-local.json` — mỗi clone/worktree chạy mode riêng. Mode `balance` là nấc giữa và **KHÔNG phải bản sao của `quality`**: model routing giữ y như `quality`, nhưng **ngân sách spawn đã siết bằng `usage`** (số ở `policy/defaults.json`, tinh chỉnh thật chốt ở lô 4). Mode `usage` hạ tiếp: planner Sonnet cho plan lặp-pattern · debugger Sonnet cho bug quen tái hiện được · explorer Haiku · tie-break "phân vân" đổi thành model RẺ trừ vùng đắt/contract. (Từ 1.3.1 implementer là Sonnet ở **mọi** mode — Opus là thứ phải xin tường minh cho bước `SUY LUẬN`/contract/ESCALATE, đúng khuôn sandwich ở trên.) **Bất biến KHÔNG đổi ở mọi mode**: sàn Opus + inherit cho review vùng đắt · cấm hạ model cho contract/logic phức tạp · 3-strikes · ledger · thang máy escalate 2-fail luôn được phép. Cơ chế: hook SessionStart `policy-session-start.sh` bơm khối `⚙️ POLICY` đã resolve ở **MỌI** mode (không còn im lặng ở `quality`); `policy/` là nguồn sự thật của MỌI ngưỡng — số nào còn nằm trong prose (kể cả bảng model trên + bảng DELTA của skill) là **nợ chưa dọn**, lệch với policy thì policy đúng. Guard PreToolUse (**warn-mode giai đoạn 1** — nhắc, không chặn) soi spawn lệch mode, và CHỈ soi ở `usage`. Model phiên MAIN không tự đổi được — skill chỉ nhắc user gõ `/model`. Thiết kế + policy đầy đủ: `docs/design/2026-07-22-config-mode-design.md`.
+**Mode quality/balance/usage — công tắc per-clone cho chính sách model.** Bảng trên là baseline (= mode `quality`, mặc định khi chưa bật gì). Lệnh `/custom-claude-config-mode [quality|balance|usage]` (skill cùng tên) ghi state per-clone `<git-dir>/config-mode-local.json` — mỗi clone/worktree chạy mode riêng. Mode `balance` là nấc giữa và **KHÔNG phải bản sao của `quality`**: model routing giữ y như `quality`, nhưng **ngân sách spawn đã siết bằng `usage`** (số ở `policy/defaults.json`, tinh chỉnh thật chốt ở lô 4). Mode `usage` hạ tiếp: planner Sonnet cho plan lặp-pattern · debugger Sonnet cho bug quen tái hiện được · explorer Haiku · tie-break "phân vân" đổi thành model RẺ trừ vùng đắt/contract. (Từ 1.3.1 implementer là Sonnet ở **mọi** mode — Opus là thứ phải xin tường minh cho bước `SUY LUẬN`/contract/ESCALATE, đúng khuôn sandwich ở trên.) **Bất biến KHÔNG đổi ở mọi mode**: sàn Opus + inherit cho review vùng đắt · cấm hạ model cho contract/logic phức tạp · 3-strikes · ledger · thang máy escalate 2-fail luôn được phép. Cơ chế: hook SessionStart `policy-session-start.sh` bơm khối `⚙️ POLICY` đã resolve ở **MỌI** mode (không còn im lặng ở `quality`); `policy/` là nguồn sự thật của MỌI ngưỡng — số nào còn nằm trong prose (kể cả bảng model trên + bảng DELTA của skill) là **nợ chưa dọn**, lệch với policy thì policy đúng. Guard PreToolUse (**warn-mode giai đoạn 1** — nhắc, không chặn) soi spawn lệch mode, và CHỈ soi ở `usage`. Hook PreToolUse ĐẶT `model` theo `modelRouting` đã trộn (defaults ← dự án ← clone) cho mọi spawn chưa ghi model, ở mọi mode — `usage`: planner/debugger thành Sonnet; cần Opus (thiết kế mới · bug lạ · contract) ⇒ GHI `model: opus`. Ghi sẵn hoặc prompt `ESCALATE` ⇒ không đặt. `inherit` = chạy model frontmatter của agent, KHÔNG phải model phiên chính. Bảng không hạ `code-reviewer` dưới Opus (policy lỗi ⇒ không đặt gì); hook không chặn spawn tự ghi model thấp — sàn đó là luật cho main. Model phiên MAIN không tự đổi được — skill chỉ nhắc user gõ `/model`.
 
 **Advisor protocol (bắt buộc khi điều phối subagents)**:
 1. Subagent gặp bế tắc / có ≥ 2 hướng không chắc / sắp đụng contract bất biến ⇒ trả về `NEEDS_ADVICE` (format định nghĩa trong từng agent file) thay vì tự đoán.
@@ -861,7 +859,7 @@ SPAWN (nếu có spawn subagent): <agent> | ngân sách read_first ~<K>k token
        ⚠️ diff CÓ DẤU HIỆU cần review (bảng ở §12) mà vẫn `SPAWN: 0` ⇒ PHẢI kèm 1 dòng ghi
        CÂU TRẢ LỜI DỨT KHOÁT của user (đồng ý spawn / user chủ động miễn). "Đã xin, chưa trả lời" là
        CHỜ NGƯỜI, chưa được land. `SPAWN: 0` TRƠN ở diff chạm cửa = cổng review bị bỏ IM LẶNG ⇒ ledger
-       KHÔNG hợp lệ, vai đến sau TỪ CHỐI trích nó làm bằng chứng. Áp cho ledger ghi từ v2.10 trở đi.
+       KHÔNG hợp lệ, vai đến sau TỪ CHỐI trích nó làm bằng chứng.
 GATE-AT (khi có spawn review): gate chạy tại HEAD <x> / DIRTY <y> — bản TRƯỚC review. Review bắt buộc
        luôn chạy TRƯỚC khi snapshot cuối tồn tại, nên đây là mốc reviewer đối soát; thiếu dòng này
        reviewer đọc "chưa chụp" thành LEDGER-STALE.
@@ -895,9 +893,10 @@ ledger mới. Bằng chứng trước lời khẳng định — đó là cổng 
 - Full gate (`typecheck + lint + test + structure + spec`) chạy **đúng 1 lần trên diff cuối**: bởi `verifier` nếu có spawn, không thì implementer tự chạy — vai chạy là vai ghi ledger.
 - **Gate cuối chạy bằng `cc-harness gate`** — nó chạy đúng `gate.commands` khai trong `claude_config.json`, thu mã thoát từng lệnh, rồi sinh ledger. Vai nào chạy là vai đó ghi ledger.
 - `code-reviewer` KHÔNG chạy test/lint/typecheck — chỉ đọc diff + đối chiếu ledger.
+- `ocr` (tuỳ chọn, `integrations.ocr`): máy có thì `code-reviewer` BẮT BUỘC chạy `ocr delegate preview` (đối chiếu tệp trong diff, không đổi phạm vi) + `rule` (checklist PHỤ; tệp `excluded` vẫn tự review) và mở báo cáo bằng một dòng `OCR: đã chạy — …`; máy không có thì bỏ qua lặng (không dòng, không lỗi); CHỈ `delegate`, cấm `ocr review/scan`; không thay Opus.
 - Main agent KHÔNG chạy lại gate khi ledger khớp HEAD/DIRTY hiện tại.
 
-**No silent skip — guard không được im lặng.** Mọi validator/gate/probe của bộ khung: bỏ qua vì **thiếu tiền đề** (thiếu file, thiếu công cụ, không phân giải được root, không đọc được git…) ⇒ **PHẢI nói ra** — WARN nêu rõ thiếu gì + cách sửa. **CẤM** đường "không kiểm được" mà vẫn `exit 0` không một dòng nào: đó chính là false-negative im lặng, loại lỗi đắt nhất (gate xanh nhưng chẳng kiểm gì — đã xảy ra 4 lần). Cổng (`cc-harness spec`, `cc-harness structure`, `cc-harness doctor`) ⇒ exit ≠ 0 khi không phân giải được đối tượng cần kiểm; tool advisory (``cc-harness observe``, `changelog-view`, `observe`) ⇒ WARN rồi tiếp tục, KHÔNG chặn task. Mọi tool in **root đã dùng** (xem `specs/project-root/spec.md`).
+**No silent skip — guard không được im lặng.** Mọi validator/gate/probe của bộ khung: bỏ qua vì **thiếu tiền đề** (thiếu file, thiếu công cụ, không phân giải được root, không đọc được git…) ⇒ **PHẢI nói ra** — WARN nêu rõ thiếu gì + cách sửa. **CẤM** đường "không kiểm được" mà vẫn `exit 0` không một dòng nào: đó chính là false-negative im lặng, loại lỗi đắt nhất (gate xanh nhưng chẳng kiểm gì — đã xảy ra 4 lần). Cổng (`cc-harness spec`, `cc-harness structure`, `cc-harness doctor`) ⇒ exit ≠ 0 khi không phân giải được đối tượng cần kiểm; tool advisory (`cc-harness observe`, `cc-harness changelog`) ⇒ WARN rồi tiếp tục, KHÔNG chặn task. Mọi tool in **root đã dùng**.
 
 **Chặn xoay vòng fix (3-strikes):** cùng một test fail với cùng một lỗi 3 lần liên tiếp ⇒ CẤM sửa tiếp — implementer trả `NEEDS_ADVICE`, main chuyển `debugger` hoặc hỏi user. (Tương tự quy tắc 3-giả-thuyết của debugger.)
 
@@ -1056,8 +1055,7 @@ MCP server rời thì `mcp__agent-tasks__<tool>`). Mục này gọi tắt bằng
 | **Nạp bối cảnh: N ngày qua đổi gì, VÌ SAO, nợ gì** | `tasks_recap` — xem mục dưới |
 | Chẩn đoán | `tasks_doctor` |
 
-`tasks_ingest` **không còn trên mặt MCP** từ agent-tasks v0.2 (nhập hàng loạt là thao tác khó lùi ⇒
-thuộc terminal: `tasks-cli ingest`, mặc định dry-run).
+Nhập hàng loạt **không có tool MCP** (thao tác khó lùi ⇒ thuộc terminal: `tasks-cli ingest`, mặc định dry-run).
 
 **Ba tool MỞ KHOÁ cổng claim**: `task_intake` · `task_claim_next` · `task_claim`. Tool đọc
 (`tasks_list`, `task_get`, `tasks_my_claims`) **không** tính là đã claim — xem hàng đợi ≠ giành việc.
@@ -1160,12 +1158,12 @@ hai cửa của cấp 3 chính là 4 slug đầu:
 `care` ánh xạ trực tiếp trục rủi ro: mức thường ⇒ `thuong`, chạm thứ đắt ⇒ `chat` (⇒ item mang nhãn
 `careful`).
 
-⚠️ Từ agent-tasks **v0.2**, `shape`/`role`/`source` vào `agent-meta`, KHÔNG còn là nhãn GitLab. Vẫn
-**truyền y như cũ**: cùng tham số, cùng enum, server tự quyết ghi vào đâu. Hai điều đổi với người gọi:
-- Giá trị ngoài enum ⇒ **isError trước khi tạo item** (không còn lặng lẽ thành nhãn rác).
+`shape`/`role`/`source` nằm trong `agent-meta`, không phải nhãn GitLab: truyền cùng tham số, cùng enum,
+server tự quyết ghi vào đâu. Hai điều cần biết:
+- Giá trị ngoài enum ⇒ **isError trước khi tạo item**.
 - `tasks_list`/`task_claim_next` lọc `role`/`shape`/`source` ở **client** trên một trang 100 item, và
-  trả `scan.truncated`. `truncated: true` nghĩa là **còn item ngoài phạm vi quét** — không phải
-  "hàng đợi chỉ có thế". Đọc nó trước khi kết luận không còn việc.
+  trả `scan.truncated`. `truncated: true` nghĩa là **còn item ngoài phạm vi quét**, không phải
+  "hàng đợi chỉ có thế" — đọc nó trước khi kết luận không còn việc.
 
 **Board 5 cột (agent-tasks ≥ 0.3), đọc bằng mắt người** — trạng thái là nhãn `status::*`:
 

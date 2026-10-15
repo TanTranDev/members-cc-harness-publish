@@ -32,9 +32,9 @@ Theo bảng quyết định bộ luật §7: `get_architecture`/`trace_path`/`se
 
 ## Nơi ghi tài liệu (xem bộ luật §10)
 
-- Plan theo lô ⇒ `docs/wip/YYYY-MM-DD-<lô-slug>/plan.md` (local, không commit). Task gọi API/WS ⇒ phải có mục **Backend contract** (endpoint, request/response shape, error codes).
+- Chia việc ⇒ tạo **item** trong agent-tasks, thứ tự và phụ thuộc khai bằng trường của item (bộ luật §10 — `plan.md` đã bỏ). Task gọi API/WS ⇒ phải có mục **Backend contract** (endpoint, request/response shape, error codes).
 - **Plan phải MỎNG**: trỏ pattern (*"làm giống `<file>`"*) cho phần lặp, chỉ đặc ở phần khó/mới. **CẤM chép code hoàn chỉnh vào plan** — implementer đọc lại plan mỗi task, nên mỗi KB thừa bị nhân lên N lần (đo được: plan 59,8 KB ≈ 15,3k token × 5 lượt đọc).
-- **KHÔNG tạo loại file nào khác** trong `docs/wip/` — chỉ `plan.md` + `verify.md`. `brainstorming.md` và `implement.md` đã bị bỏ (bộ luật §10).
+- **KHÔNG tạo loại file nào khác** trong `docs/wip/` — chỉ `brief.md` (khi agent-tasks tắt) và `verify.md` (bộ luật §10).
 - Thiết kế đã chốt ⇒ **item của agent-tasks**; `agent_tasks` tắt ⇒ `docs/wip/<lô>/design.md` **local, KHÔNG push** (bộ luật §10 — md mô tả HIỆN TẠI outdate nhanh, và một thiết kế outdate trên remote tệ hơn không có).
 
 ## Cấm

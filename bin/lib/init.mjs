@@ -111,7 +111,7 @@ export function buildConfig(d) {
     // finding gồm 1 bug thật). Phiền một câu hỏi thì sửa được bằng cách đổi sang `off`.
     review: { confirm: 'on', soft_cap: 3 },
     observe: { target: 'in-process', kind: 'command' },
-    integrations: { cc_lock: 'optional', cbm: 'optional', rtk: 'optional', agent_tasks: 'off' },
+    integrations: { cc_lock: 'optional', cbm: 'optional', rtk: 'optional', ocr: 'optional', agent_tasks: 'off' },
     policy: { mode: 'quality' },
   };
 }

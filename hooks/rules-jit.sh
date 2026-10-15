@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse(Edit|Write|MultiEdit · Task) — NẠP LUẬT ĐÚNG LÚC, một lần mỗi phiên cho mỗi gói.
+# PreToolUse(Edit|Write|MultiEdit · Task/Agent) — NẠP LUẬT ĐÚNG LÚC, một lần mỗi phiên cho mỗi gói.
 #
 # Vì sao có hook này (1.3.1): §0 (LÕI, ~12 KB) bơm ở đầu phiên; phần còn lại là tầng TRA, agent phải nhớ
 # gõ `cc-harness rules §N` đúng lúc — và đo được là nó hay không gõ. Agent .md đời trước bù bằng cách
@@ -8,7 +8,7 @@
 # đúng gói vào đúng thời điểm, đúng MỘT lần mỗi phiên:
 #
 #   sắp Edit/Write dưới src_dir  ⇒ gói `edit` = §3 (TDD) + §6 (quy ước)          ~10 KB
-#   sắp Task (spawn subagent)    ⇒ gói `task` = §11 (điều phối · bàn giao · model) ~15 KB
+#   sắp Task/Agent (spawn)       ⇒ gói `task` = §11 (điều phối · bàn giao · model) ~15 KB
 #
 # Bản bơm là bản ĐÃ TRỘN override của dự án (`cc-harness rules`), không phải base.
 #
@@ -55,7 +55,7 @@ process.stdin.on("end", () => {
   // từng gói sau mỗi lần sửa rules/.
   const BUNDLES = {
     edit: { tools: new Set(["Edit", "Write", "MultiEdit"]), ids: ["§3", "§6"], why: "sắp sửa code" },
-    task: { tools: new Set(["Task"]), ids: ["§11"], why: "sắp spawn subagent" },
+    task: { tools: new Set(["Task", "Agent"]), ids: ["§11"], why: "sắp spawn subagent" },
   };
   const bundle = Object.entries(BUNDLES).find(([, b]) => b.tools.has(tool));
   if (!bundle) process.exit(0);

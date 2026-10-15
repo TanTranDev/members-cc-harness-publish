@@ -4,7 +4,7 @@
 // Mọi lỗi ⇒ im lặng exit 0: guard là lưới PHỤ, không được làm hỏng lượt spawn.
 import fs from 'node:fs';
 
-import { checkSpawn } from './config-mode-guard.mjs';
+import { decideSpawn } from './config-mode-guard.mjs';
 import { loadConfig } from './config.mjs';
 
 const argOf = (name) => {
@@ -15,11 +15,12 @@ const argOf = (name) => {
 try {
   const payload = JSON.parse(fs.readFileSync(0, 'utf8'));
   const root = argOf('--root') || payload?.cwd || process.cwd();
-  const out = checkSpawn(payload, {
+  const out = decideSpawn(payload, {
     root,
     pluginRoot: argOf('--plugin-root') || process.env.CLAUDE_PLUGIN_ROOT,
     config: loadConfig(root).config,
   });
   if (out && Object.keys(out).length) process.stdout.write(JSON.stringify(out));
 } catch { /* payload rác / môi trường thiếu ⇒ im */ }
-process.exit(0);
+// KHÔNG gọi process.exit(): với stdout là pipe, exit ngay sau write cắt output ở 64 KiB (JSON hỏng).
+process.exitCode = 0;

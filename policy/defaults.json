@@ -92,17 +92,6 @@
         "tokensK": 30
       }
     },
-    "brief-writer": {
-      "quality": null,
-      "balance": {
-        "toolCalls": 6,
-        "tokensK": 30
-      },
-      "usage": {
-        "toolCalls": 6,
-        "tokensK": 30
-      }
-    },
     "changelog-writer": {
       "quality": null,
       "balance": {
@@ -183,11 +172,6 @@
       "quality": "opus",
       "balance": "opus",
       "usage": "opus"
-    },
-    "brief-writer": {
-      "quality": "sonnet",
-      "balance": "sonnet",
-      "usage": "sonnet"
     },
     "troubleshoot-writer": {
       "quality": "sonnet",

@@ -58,7 +58,7 @@ Mọi khoá còn lại có mặc định hợp lý. Thêm dần khi cần, đừ
 | `observe.target` | `in-process` \| `served` \| `deployed` | `observe` | `in-process` |
 | `observe.kind` | `command` \| `screenshot-ios` \| `screenshot-android` \| `none` | `observe` | `command` |
 | `observe.port` · `via` · `docker_project` · `freshness` · `deployed_id_cmd` · `src_dirs` · `out_dir` | tuỳ | `observe` | tuỳ đích |
-| `integrations.cc_lock` · `cbm` · `rtk` · `agent_tasks` | `required` \| `optional` \| `off` | `doctor` · các cổng hook | `optional` |
+| `integrations.cc_lock` · `cbm` · `rtk` · `ocr` · `agent_tasks` | `required` \| `optional` \| `off` | `doctor` · các cổng hook | `optional` |
 | `policy.mode` | `quality` \| `balance` \| `usage` | `policy` | `quality` |
 
 **Khoá ĐÃ BỎ** — khai vào sẽ nhận WARN nói rõ lý do:
@@ -229,10 +229,10 @@ Mẫu về HÌNH THỨC, điền sẵn cho MỘT stack (React Native): `examples
 `cc-harness observe` **luôn exit 0**: không lấy được bằng chứng ⇒ hạ MỨC + nêu lý do, agent ghi
 `PENDING` và land bình thường.
 
-### `integrations` — bốn tích hợp ngoài
+### `integrations` — năm tích hợp ngoài
 
 ```jsonc
-"integrations": { "cc_lock": "required", "cbm": "required", "rtk": "optional", "agent_tasks": "off" }
+"integrations": { "cc_lock": "required", "cbm": "required", "rtk": "optional", "ocr": "optional", "agent_tasks": "off" }
 ```
 
 | Khoá | Tool | Khung làm gì |
@@ -240,6 +240,7 @@ Mẫu về HÌNH THỨC, điền sẵn cho MỘT stack (React Native): `examples
 | `cc_lock` | plugin `cc-lock` | áp luật khoá tệp trước khi sửa vùng single-writer; probe đã cài chưa |
 | `cbm` | `codebase-memory-mcp` | cổng cứng "graph TRƯỚC, grep SAU", vũ trang lại theo MỖI yêu cầu |
 | `rtk` | `rtk` | áp luật bằng chứng phải là output thô |
+| `ocr` | `open-code-review` | `code-reviewer` lấy danh sách tệp đối chiếu + checklist phụ qua `ocr delegate`; CHỈ delegate, không `ocr review`; mặc định optional |
 | `agent_tasks` | plugin `agent-tasks` | áp §14 + cổng claim-task; brief 7 mục vào item |
 
 Ba trạng thái, và chúng thật sự khác nhau:

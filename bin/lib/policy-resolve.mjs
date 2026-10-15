@@ -15,7 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 
-import { readJson, mergePolicy, validatePolicy } from './policy.mjs';
+import { readJson, mergePolicy, validatePolicy, isKnownRouting } from './policy.mjs';
 
 export const MODE_STATE_FILE = 'config-mode-local.json';
 export const LOCAL_POLICY_FILE = 'policy-local.json';
@@ -70,6 +70,14 @@ export function resolvePolicy({ root, pluginRoot, config }) {
   const policy = mergePolicy(dflt.value, project, local);
   const perrs = validatePolicy(policy);
   if (perrs.length) errors.push(...perrs);
+  // Giá trị model không hook nào áp được (`Haiku`, `gpt-9`) ⇒ WARN, không phải lỗi: hook bỏ qua và
+  // vai chạy model frontmatter — nói ra để người khai biết bảng của mình không có tác dụng.
+  // GHIM: `policy --render` in các cảnh báo này nên khối ⚙️ POLICY của SessionStart (chạy `--render 2>&1`)
+  // cũng mang dòng ⚠ — chấp nhận, có test (tests/model-routing.test.sh).
+  for (const [role, byMode] of Object.entries(policy?.modelRouting ?? {}))
+    for (const [m, v] of Object.entries(byMode && typeof byMode === 'object' ? byMode : {}))
+      if (typeof v === 'string' && !isKnownRouting(v))
+        warnings.push(`modelRouting.${role}.${m}: "${v}" không phải opus|sonnet|haiku|fable|inherit ⇒ hook BỎ QUA (id đầy đủ chỉ dùng được trong frontmatter của agent)`);
   if (errors.length) return { ok: false, policy, mode: null, errors, warnings, sources };
 
   // ── mode ──

@@ -77,7 +77,7 @@ Mọi thứ còn lại là công trình gốc của Chủ sở hữu và thuộc
 | `rules/` | bộ luật gốc (§0–§14), cơ chế tách tầng LÕI/TRA |
 | `bin/` | CLI `cc-harness` và toàn bộ `bin/lib/*.mjs` |
 | `hooks/` | 14 hook, TRỪ `superpowers-session-start.sh` (đã gỡ) |
-| `agents/` | 12 subagent |
+| `agents/` | 11 subagent |
 | `policy/` | tham số vận hành ba tầng |
 | `examples/` | ví dụ override cho RN mini-app |
 | **7 skill** | `behavior-specs` · `changelog` · `confirm-understanding` · `custom-claude-config-mode` · `handoff` · `migrate` · `writing-component-tests` |

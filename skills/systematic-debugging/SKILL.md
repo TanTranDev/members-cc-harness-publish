@@ -13,13 +13,10 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 
 **Violating the letter of this process is violating the spirit of debugging.**
 
-## The Iron Law
+## The Rule
 
-```
-NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
-```
-
-If you haven't completed Phase 1, you cannot propose fixes.
+Find the root cause before proposing a fix: a fix applied to a symptom hides the bug and produces the
+next one. Complete Phase 1 first.
 
 ## When to Use
 

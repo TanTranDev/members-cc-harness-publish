@@ -7,7 +7,7 @@ Bộ khung quy trình cho Claude Code, dạng plugin. Cài **một lần cho c�
 thứ duy nhất đổi theo stack là **danh sách lệnh gate** — một mảng chuỗi trong config. Xem *[Đổi stack
 là đổi một mảng](#đổi-stack-là-đổi-một-mảng)*.
 
-Cài xong, phiên Claude Code của bạn có thêm: **21 skill** · **12 subagent** · **14 cổng hook** ·
+Cài xong, phiên Claude Code của bạn có thêm: **21 skill** · **11 subagent** · **14 cổng hook** ·
 **12 lệnh CLI** · một bộ luật 56 mục mà chỉ phần LÕI được bơm vào context.
 
 ---
@@ -213,6 +213,7 @@ Harness **áp luật** dùng chúng; **config là của plugin đó**, harness k
 | `cc_lock` | `cc-lock` | áp luật khoá tệp trước khi sửa hot-zone; probe đã cài chưa |
 | `cbm` | `codebase-memory-mcp` | áp cổng cứng *"graph TRƯỚC, grep SAU"* — vũ trang lại theo **mỗi yêu cầu** của user |
 | `rtk` | `rtk` | áp luật bằng chứng phải là output thô |
+| `ocr` | `open-code-review` | `code-reviewer` lấy danh sách tệp đối chiếu + checklist phụ qua `ocr delegate` (chỉ delegate, không `ocr review`) |
 | `agent_tasks` | `agent-tasks` | áp **§14**: claim task trước khi sửa code · brief 7 mục vào item · chia việc = tạo item có `parent`/`depends-on` |
 
 Mỗi khoá nhận `required` · `optional` · `off`. Khai `required` mà thiếu ⇒ cảnh báo kèm cách cài.
